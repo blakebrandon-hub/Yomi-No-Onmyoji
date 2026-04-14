@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NECROMANCER</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+<style>
+:root {
+    --bg-void: #030507;
+    --bg-panel: #07090c;
+    --bg-panel-alt: #0a0d11;
+    --bg-entry: #0d1117;
+    --border: #1a2030;
+    --border-dim: #111820;
+    --border-void: #2a1535;
+
+    --text-main: #c8c0b8;
+    --text-dim: #5a5550;
+    --text-bone: #e8e0d0;
+    --text-title: #d4c8b0;
+
+    --accent-soul: #7c4dff;
+    --accent-soul-dim: #3d1f80;
+    --accent-void: #4a0080;
+    --accent-rot: #2d6b3a;
+    --accent-rot-bright: #3d9b52;
+    --accent-danger: #8b1a1a;
+    --accent-danger-bright: #cc2222;
+    --accent-bone: #c8b88a;
+    --accent-bone-dim: #6b5f3a;
+    --accent-tear: #6600aa;
+    --accent-tear-bright: #aa44ff;
+
+    --font-title: 'Cinzel', serif;
+    --font-prose: 'Crimson Text', serif;
+    --font-ui: 'Share Tech Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg-void);
+    color: var(--text-main);
+    font-family: var(--font-prose);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 42px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+    flex-shrink: 0;
+}
+
+.header-title {
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--accent-bone);
+    text-transform: uppercase;
+}
+
+.header-meta {
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+}
+
+.header-turn {
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+    color: var(--accent-soul);
+    letter-spacing: 2px;
+}
+
+/* ── MAIN LAYOUT ── */
+.game-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 280px;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ── LEFT PANEL ── */
+.panel-left {
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-panel);
+}
+
+.panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-tab {
+    flex: 1;
+    padding: 8px 4px;
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    text-align: center;
+    color: var(--text-dim);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    text-transform: uppercase;
+    transition: color 0.2s, background 0.2s;
+}
+
+.panel-tab:last-child { border-right: none; }
+.panel-tab:hover { color: var(--accent-bone); }
+.panel-tab.active {
+    color: var(--accent-soul);
+    background: rgba(124, 77, 255, 0.05);
+    border-bottom: 1px solid var(--accent-soul);
+}
+
+.panel-section-label {
+    font-family: var(--font-ui);
+    font-size: 0.55rem;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    padding: 8px 12px 4px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.spell-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+}
+
+.spell-item {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--border-dim);
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.spell-item:hover { background: rgba(124, 77, 255, 0.06); }
+
+.spell-info { display: flex; flex-direction: column; }
+
+.spell-school {
+    font-family: var(--font-ui);
+    font-size: 0.5rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.spell-name {
+    font-family: var(--font-prose);
+    font-size: 0.9rem;
+    color: var(--text-bone);
+    font-style: italic;
+}
+
+.spell-cost {
+    font-family: var(--font-ui);
+    font-size: 0.55rem;
+    color: var(--accent-soul);
+    letter-spacing: 1px;
+}
+
+/* BESTIARY tab */
+.bestiary-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+}
+
+.unit-entry {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-dim);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.unit-entry:hover { background: rgba(45, 107, 58, 0.08); }
+
+.unit-name {
+    font-family: var(--font-prose);
+    font-size: 0.9rem;
+    color: var(--accent-rot-bright);
+    font-weight: 600;
+}
+
+.unit-was {
+    font-family: var(--font-ui);
+    font-size: 0.5rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-top: 2px;
+    text-transform: uppercase;
+}
+
+.unit-memory {
+    font-family: var(--font-prose);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-top: 3px;
+    line-height: 1.3;
+}
+
+.unit-hp {
+    font-family: var(--font-ui);
+    font-size: 0.5rem;
+    color: var(--accent-rot);
+    margin-top: 4px;
+}
+
+/* RITUAL CIRCLE */
+.ritual-section {
+    border-top: 1px solid var(--border);
+    padding: 10px 12px;
+    background: rgba(74, 0, 128, 0.04);
+}
+
+.ritual-label {
+    font-family: var(--font-ui);
+    font-size: 0.55rem;
+    letter-spacing: 3px;
+    color: var(--accent-soul-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ritual-label::before {
+    content: '◆';
+    color: var(--accent-soul);
+    font-size: 0.5rem;
+}
+
+.ritual-slot {
+    background: var(--bg-entry);
+    border: 1px solid var(--border-void);
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    font-family: var(--font-prose);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+}
+
+.ritual-slot.active {
+    color: var(--accent-tear-bright);
+    border-color: var(--accent-tear);
+    background: rgba(102, 0, 170, 0.08);
+}
+
+.ritual-requires {
+    font-family: var(--font-ui);
+    font-size: 0.5rem;
+    color: var(--accent-soul-dim);
+    margin-top: 3px;
+    letter-spacing: 1px;
+}
+
+.btn-small {
+    font-family: var(--font-ui);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    margin-top: 4px;
+    transition: all 0.2s;
+}
+
+.btn-small:hover {
+    border-color: var(--accent-soul);
+    color: var(--accent-soul);
+}
+
+/* BOTTOM BUTTONS */
+.panel-bottom-btns {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--border);
+}
+
+.btn-bottom {
+    flex: 1;
+    padding: 8px;
+    font-family: var(--font-ui);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-bottom:last-child { border-right: none; }
+.btn-bottom:hover { color: var(--accent-bone); background: rgba(200, 184, 138, 0.04); }
+
+.btn-visualize {
+    width: 100%;
+    padding: 8px;
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: rgba(124, 77, 255, 0.06);
+    border: 1px solid var(--accent-soul-dim);
+    color: var(--accent-soul);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0;
+}
+
+.btn-visualize:hover {
+    background: rgba(124, 77, 255, 0.15);
+    border-color: var(--accent-soul);
+}
+
+/* ── CENTER PANEL ── */
+.panel-center {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+}
+
+.chronicle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 36px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+    flex-shrink: 0;
+}
+
+.chronicle-label {
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chronicle-label::before {
+    content: '◆';
+    color: var(--accent-bone-dim);
+    font-size: 0.5rem;
+}
+
+.chronicle-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px 40px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.chronicle-body::-webkit-scrollbar { width: 4px; }
+.chronicle-body::-webkit-scrollbar-track { background: transparent; }
+.chronicle-body::-webkit-scrollbar-thumb { background: var(--border); }
+
+.message-block {
+    margin-bottom: 28px;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-player {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    color: var(--accent-bone);
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    padding-left: 2px;
+}
+
+.message-player span {
+    color: var(--accent-bone-dim);
+    margin-right: 6px;
+}
+
+.message-narrative {
+    font-family: var(--font-prose);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-bone);
+}
+
+.message-narrative p { margin-bottom: 12px; }
+.message-narrative p:last-child { margin-bottom: 0; }
+.message-narrative em { color: var(--accent-bone); }
+
+.message-signal {
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+    color: var(--accent-soul);
+    letter-spacing: 1px;
+    margin-top: 16px;
+    padding: 6px 10px;
+    border-left: 2px solid var(--accent-soul-dim);
+    background: rgba(124, 77, 255, 0.04);
+}
+
+/* IMAGE */
+.scene-image {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    filter: saturate(0.7) contrast(1.1);
+    display: block;
+}
+
+/* INPUT */
+.chronicle-input {
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    background: var(--bg-panel);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.input-prompt {
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+    color: var(--accent-bone-dim);
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+
+.input-field {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-bone);
+    font-family: var(--font-prose);
+    font-size: 1rem;
+    outline: none;
+    font-style: italic;
+}
+
+.input-field::placeholder { color: var(--text-dim); font-style: italic; }
+
+.btn-submit {
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    background: rgba(124, 77, 255, 0.08);
+    border: 1px solid var(--accent-soul-dim);
+    color: var(--accent-soul);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-submit:hover {
+    background: rgba(124, 77, 255, 0.2);
+    border-color: var(--accent-soul);
+}
+
+/* ── RIGHT PANEL ── */
+.panel-right {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-panel);
+}
+
+/* MAP */
+.map-section {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    flex-shrink: 0;
+}
+
+.section-label {
+    font-family: var(--font-ui);
+    font-size: 0.55rem;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.section-label::before {
+    content: '◆';
+    color: var(--accent-bone-dim);
+    font-size: 0.45rem;
+}
+
+.map-canvas {
+    width: 100%;
+    height: 160px;
+    background: var(--bg-void);
+    border: 1px solid var(--border-void);
+    position: relative;
+    overflow: hidden;
+}
+
+.map-canvas canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* STATUS */
+.status-scroll {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.status-section {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+}
+
+.status-row-label { color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+.status-row-value { color: var(--text-bone); }
+.status-row-value.danger { color: var(--accent-danger-bright); }
+.status-row-value.good { color: var(--accent-rot-bright); }
+.status-row-value.soul { color: var(--accent-soul); }
+
+.stat-bar {
+    height: 3px;
+    background: var(--border);
+    margin-bottom: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.stat-bar-fill.soul { background: var(--accent-soul); box-shadow: 0 0 6px var(--accent-soul); }
+.stat-bar-fill.danger { background: var(--accent-danger-bright); box-shadow: 0 0 6px var(--accent-danger); }
+.stat-bar-fill.rot { background: var(--accent-rot-bright); box-shadow: 0 0 6px var(--accent-rot); }
+.stat-bar-fill.void { background: var(--accent-tear-bright); box-shadow: 0 0 6px var(--accent-tear); }
+
+/* VITALS BOXES */
+.vitals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.vital-box {
+    background: var(--bg-entry);
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    text-align: center;
+}
+
+.vital-box-label {
+    font-family: var(--font-ui);
+    font-size: 0.45rem;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.vital-box-value {
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.vital-box-value.hp { color: var(--accent-danger-bright); }
+.vital-box-value.soul { color: var(--accent-soul); }
+
+/* ARMY */
+.army-section {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.army-count {
+    font-family: var(--font-title);
+    font-size: 1.4rem;
+    color: var(--accent-rot-bright);
+    font-weight: 600;
+    display: inline;
+}
+
+.army-label {
+    font-family: var(--font-ui);
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-left: 6px;
+}
+
+/* STANDING */
+.standing-section {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.standing-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-dim);
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+}
+
+.standing-row:last-child { border-bottom: none; }
+.standing-name { color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+.standing-val { color: var(--text-bone); }
+.standing-val.neg { color: var(--accent-danger-bright); }
+.standing-val.pos { color: var(--accent-rot-bright); }
+
+/* OATHS */
+.oaths-section {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.oath-card {
+    background: var(--bg-entry);
+    border: 1px solid var(--accent-bone-dim);
+    padding: 8px 10px;
+    margin-bottom: 6px;
+}
+
+.oath-card.completed {
+    border-color: var(--accent-rot);
+    opacity: 0.6;
+}
+
+.oath-title {
+    font-family: var(--font-prose);
+    font-size: 0.85rem;
+    color: var(--accent-bone);
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.oath-title.completed {
+    color: var(--accent-rot-bright);
+    text-decoration: line-through;
+}
+
+.oath-desc {
+    font-family: var(--font-prose);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.oath-status {
+    font-family: var(--font-ui);
+    font-size: 0.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    color: var(--accent-soul);
+}
+
+.oath-status.complete { color: var(--accent-rot-bright); }
+.oath-status.failed { color: var(--accent-danger-bright); }
+
+.oath-empty {
+    font-family: var(--font-prose);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+}
+
+/* SCROLLBAR */
+.status-scroll::-webkit-scrollbar { width: 3px; }
+.status-scroll::-webkit-scrollbar-track { background: transparent; }
+.status-scroll::-webkit-scrollbar-thumb { background: var(--border); }
+
+.spell-list::-webkit-scrollbar { width: 3px; }
+.spell-list::-webkit-scrollbar-track { background: transparent; }
+.spell-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+/* VOID PULSE ANIMATION */
+@keyframes voidPulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+}
+
+.void-active { animation: voidPulse 2s infinite; }
+
+/* TAB CONTENT */
+.tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.tab-content.active { display: flex; }
+
+/* LOADING */
+.loading-indicator {
+    display: none;
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    color: var(--accent-soul);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 8px 0;
+    animation: voidPulse 1.5s infinite;
+}
+
+.loading-indicator.visible { display: block; }
+
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="header-title">Necromancer</div>
+    <div class="header-meta">LOCATION: <span id="current-location-header">GREYFALL</span></div>
+    <div style="display:flex; align-items:center; gap:12px;">
+        <button id="tts-toggle" onclick="tts.toggle()" style="
+            font-family: var(--font-ui);
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            background: transparent;
+            border: 1px solid var(--accent-soul-dim);
+            color: var(--accent-soul);
+            cursor: pointer;
+            transition: all 0.2s;
+        ">◉ VOICE</button>
+        <div class="header-turn">TURN <span id="turn-counter">0</span></div>
+    </div>
+</header>
+
+<!-- MAIN -->
+<div class="game-layout">
+
+    <!-- LEFT: GRIMOIRE / BESTIARY -->
+    <div class="panel-left">
+        <div class="panel-tabs">
+            <button class="panel-tab active" onclick="switchLeftTab('grimoire', this)">Grimoire</button>
+            <button class="panel-tab" onclick="switchLeftTab('bestiary', this)">Army</button>
+        </div>
+
+        <!-- GRIMOIRE TAB -->
+        <div class="tab-content active" id="tab-grimoire">
+            <div style="display:flex; border-bottom:1px solid var(--border);">
+                <button class="panel-tab active" style="font-size:0.5rem;" onclick="switchSpellSchool('summoning', this)">SUM</button>
+                <button class="panel-tab" style="font-size:0.5rem;" onclick="switchSpellSchool('corruption', this)">COR</button>
+                <button class="panel-tab" style="font-size:0.5rem;" onclick="switchSpellSchool('warding', this)">WAR</button>
+                <button class="panel-tab" style="font-size:0.5rem;" onclick="switchSpellSchool('mastery', this)">MAS</button>
+            </div>
+
+            <div class="spell-list" id="spell-list">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="ritual-section">
+                <div class="ritual-label">Ritual Circle</div>
+                <div class="ritual-slot active" id="ritual-slot-1">
+                    <div style="color:var(--accent-tear-bright); font-size:0.8rem;">Soul Binding</div>
+                    <div class="ritual-requires">Requires: 3 Risen · Major Soul</div>
+                </div>
+                <div class="ritual-slot" id="ritual-slot-2">No ritual prepared</div>
+                <button class="btn-small">⊕ Prepare Ritual</button>
+            </div>
+
+            <button class="btn-visualize" onclick="requestVisualize()">◆ VISUALIZE</button>
+            <div class="panel-bottom-btns">
+                <button class="btn-bottom" onclick="saveGame()">↓ Save</button>
+                <button class="btn-bottom" onclick="loadGame()">↑ Load</button>
+            </div>
+        </div>
+
+        <!-- ARMY TAB -->
+        <div class="tab-content" id="tab-bestiary">
+            <div class="panel-section-label">Risen Dead — <span id="army-count-label">0</span> units</div>
+            <div class="bestiary-list" id="army-list">
+                <div style="padding:16px 12px; font-family:var(--font-prose); font-size:0.8rem; color:var(--text-dim); font-style:italic;">
+                    No dead have been raised. The void consumes them instead.
+                </div>
+            </div>
+            <div class="panel-bottom-btns">
+                <button class="btn-bottom" onclick="saveGame()">↓ Save</button>
+                <button class="btn-bottom" onclick="loadGame()">↑ Load</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CENTER: CHRONICLE -->
+    <div class="panel-center">
+        <div class="chronicle-header">
+            <div class="chronicle-label">The Chronicle</div>
+            <div class="loading-indicator" id="loading">channeling...</div>
+        </div>
+
+        <div class="chronicle-body" id="chronicle-body">
+            <!-- Messages appear here -->
+        </div>
+
+        <div class="chronicle-input">
+            <!--<span class="input-prompt">MORGAR ○ ›</span>-->
+            <input type="text" class="input-field" id="action-input" placeholder="What do you do?" onkeydown="handleKey(event)">
+            <button class="btn-submit" onclick="sendAction()">TRANSMIT</button>
+        </div>
+    </div>
+
+    <!-- RIGHT: STATUS -->
+    <div class="panel-right">
+
+        <!-- MAP -->
+        <div class="map-section">
+            <div class="section-label">Fog of War</div>
+            <div class="map-canvas">
+                <canvas id="map-canvas" width="252" height="160"></canvas>
+            </div>
+        </div>
+
+        <div class="status-scroll">
+
+            <!-- LOCATION + VITALS -->
+            <div class="status-section">
+                <div class="section-label">Status</div>
+                <div class="status-row">
+                    <span class="status-row-label">Location</span>
+                    <span class="status-row-value" id="current-location">Greyfall</span>
+                </div>
+                <div class="status-row" style="margin-bottom:8px;">
+                    <span class="status-row-label">Region</span>
+                    <span class="status-row-value soul" id="current-region">Greyfall</span>
+                </div>
+                <div class="vitals-grid">
+                    <div class="vital-box">
+                        <div class="vital-box-label">Vitality</div>
+                        <div class="vital-box-value hp"><span id="hp-val">100</span></div>
+                    </div>
+                    <div class="vital-box">
+                        <div class="vital-box-label">Soul Energy</div>
+                        <div class="vital-box-value soul"><span id="soul-val">80</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ARMY -->
+            <div class="army-section">
+                <div class="section-label">Army of the Dead</div>
+                <span class="army-count" id="army-size">2</span>
+                <span class="army-label">Risen</span>
+                <div class="stat-bar" style="margin-top:6px;">
+                    <div class="stat-bar-fill rot" id="army-bar" style="width:0%"></div>
+                </div>
+            </div>
+
+            <!-- STANDING -->
+            <div class="standing-section">
+                <div class="section-label">Regional Standing</div>
+                <div class="standing-row">
+                    <span class="standing-name">Ashwood</span>
+                    <span class="standing-val" id="stand-ashwood">0</span>
+                </div>
+                <div class="standing-row">
+                    <span class="standing-name">Greyfall</span>
+                    <span class="standing-val" id="stand-greyfall">0</span>
+                </div>
+                <div class="standing-row">
+                    <span class="standing-name">Heartlands</span>
+                    <span class="standing-val" id="stand-heartlands">0</span>
+                </div>
+                <div class="standing-row">
+                    <span class="standing-name">Drowned Coast</span>
+                    <span class="standing-val" id="stand-coast">0</span>
+                </div>
+            </div>
+
+            <!-- OATHS -->
+            <div class="oaths-section">
+                <div class="section-label">Oaths Sworn</div>
+                <div id="oaths-list">
+                    <div class="oath-empty">No oath has been sworn. The dead are unburdened.</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+// ── TTS ──
+const tts = {
+    enabled: true,
+    voice: null,
+    voices: [],
+    queue: [],
+    speaking: false,
+
+    // Preferred voice names in priority order (dark, deep, authoritative)
+    PREFERRED: [
+        'Google UK English Male',
+        'Microsoft George',
+        'Microsoft Stefan',
+        'Daniel',           // macOS deep British male
+        'Arthur',           // macOS
+        'Google UK English Female',
+        'Microsoft David',
+        'Alex',
+        'Fred',
+    ],
+
+    load() {
+        const set = () => {
+            this.voices = window.speechSynthesis.getVoices();
+            if (!this.voices.length) return;
+            // Try preferred voices first
+            for (const name of this.PREFERRED) {
+                const match = this.voices.find(v => v.name === name);
+                if (match) { this.voice = match; break; }
+            }
+            // Fallback: first English voice
+            if (!this.voice) {
+                this.voice = this.voices.find(v => v.lang.startsWith('en')) || this.voices[0];
+            }
+        };
+        set();
+        window.speechSynthesis.onvoiceschanged = set;
+    },
+
+    speak(text) {
+        if (!this.enabled || !text) return;
+        // Strip markdown symbols and clean up
+        const clean = text
+            .replace(/[#*_`~]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(clean);
+        if (this.voice) utter.voice = this.voice;
+        utter.rate  = 0.82;   // slow, deliberate
+        utter.pitch = 0.75;   // low, grave
+        utter.volume = 0.95;
+        window.speechSynthesis.speak(utter);
+    },
+
+    stop() {
+        window.speechSynthesis.cancel();
+    },
+
+    toggle() {
+        this.enabled = !this.enabled;
+        if (!this.enabled) this.stop();
+        const btn = document.getElementById('tts-toggle');
+        if (btn) {
+            btn.textContent = this.enabled ? '◉ VOICE' : '◎ VOICE';
+            btn.style.color = this.enabled ? 'var(--accent-soul)' : 'var(--text-dim)';
+            btn.style.borderColor = this.enabled ? 'var(--accent-soul-dim)' : 'var(--border)';
+        }
+    }
+};
+
+// ── SPELL SFX ──
+// Interprets AI-authored JSON sound descriptors and renders them with Tone.js.
+// The AI writes the synthesis parameters; this engine executes them.
+const spellSFX = {
+
+    async play(json) {
+        await Tone.start();
+        let spec;
+        try { spec = typeof json === 'string' ? JSON.parse(json) : json; }
+        catch (e) { console.warn('SFX: bad JSON', e); return; }
+
+        const layers = Array.isArray(spec) ? spec : [spec];
+        const allNodes = [];
+
+        // Build shared effects chain from spec
+        const buildFx = (fxDef = {}) => {
+            const nodes = [];
+            let last = Tone.getDestination();
+
+            if (fxDef.reverb) {
+                const r = new Tone.Reverb({ decay: fxDef.reverb.decay ?? 3, wet: fxDef.reverb.wet ?? 0.5 });
+                r.connect(last); last = r; nodes.push(r);
+            }
+            if (fxDef.distortion) {
+                const d = new Tone.Distortion(fxDef.distortion.amount ?? 0.3);
+                d.connect(last); last = d; nodes.push(d);
+            }
+            if (fxDef.chorus) {
+                const c = new Tone.Chorus(fxDef.chorus.frequency ?? 3, fxDef.chorus.delayTime ?? 2, fxDef.chorus.depth ?? 0.5).start();
+                c.connect(last); last = c; nodes.push(c);
+            }
+            if (fxDef.volume != null) {
+                const v = new Tone.Volume(fxDef.volume);
+                v.connect(last); last = v; nodes.push(v);
+            }
+            return { input: last, nodes };
+        };
+
+        let maxDuration = 0;
+
+        for (const layer of layers) {
+            const delayMs = (layer.delay ?? 0) * 1000;
+            const { input: fxInput, nodes: fxNodes } = buildFx(layer.fx ?? {});
+            allNodes.push(...fxNodes);
+
+            const scheduleLayer = () => {
+                // ── Synth layer ──
+                if (layer.synth) {
+                    const s = layer.synth;
+                    const poly = Array.isArray(s.notes) && s.notes.length > 1;
+                    let synth;
+                    if (s.type === 'metal') {
+                        synth = new Tone.MetalSynth({
+                            frequency:       s.frequency      ?? 200,
+                            harmonicity:     s.harmonicity    ?? 5.1,
+                            modulationIndex: s.modulationIndex ?? 32,
+                            resonance:       s.resonance      ?? 4000,
+                            octaves:         s.octaves        ?? 1.5,
+                            envelope: { attack: s.attack ?? 0.001, decay: s.decay ?? 1.4, release: s.release ?? 0.2 }
+                        }).connect(fxInput);
+                        synth.triggerAttackRelease(s.duration ?? '8n');
+                    } else {
+                        const opts = {
+                            oscillator: { type: s.oscillator ?? 'sine' },
+                            envelope: { attack: s.attack ?? 0.1, decay: s.decay ?? 0.5, sustain: s.sustain ?? 0.3, release: s.release ?? 1 }
+                        };
+                        synth = poly
+                            ? new Tone.PolySynth(Tone.Synth, opts).connect(fxInput)
+                            : new Tone.Synth(opts).connect(fxInput);
+                        const notes = poly ? s.notes : (s.notes?.[0] ?? s.note ?? 'A2');
+                        synth.triggerAttackRelease(notes, s.duration ?? '4n');
+                        // Optional frequency ramp (for descending/ascending sweeps)
+                        if (s.rampTo && !poly) {
+                            synth.frequency.rampTo(s.rampTo, s.rampTime ?? 1);
+                        }
+                    }
+                    allNodes.push(synth);
+
+                    // Optional sequence of additional hits on the same synth
+                    if (s.sequence) {
+                        s.sequence.forEach(({ note, notes: ns, time, duration }) => {
+                            setTimeout(() => {
+                                const n = ns ?? note;
+                                synth.triggerAttackRelease(n, duration ?? s.duration ?? '4n');
+                            }, time * 1000);
+                        });
+                    }
+                }
+
+                // ── Noise layer ──
+                if (layer.noise) {
+                    const n = layer.noise;
+                    const noise = new Tone.NoiseSynth({
+                        noise: { type: n.color ?? 'white' },
+                        envelope: { attack: n.attack ?? 0.01, decay: n.decay ?? 0.3, sustain: n.sustain ?? 0, release: n.release ?? 0.2 }
+                    }).connect(fxInput);
+                    allNodes.push(noise);
+                    noise.triggerAttackRelease(n.duration ?? '8n');
+
+                    // Burst pattern (e.g. bone clatter)
+                    if (n.bursts) {
+                        n.bursts.forEach(t => setTimeout(() => noise.triggerAttackRelease('32n'), t * 1000));
+                    }
+                }
+            };
+
+            const layerDuration = ((layer.delay ?? 0) + (layer.totalDuration ?? 6));
+            if (layerDuration > maxDuration) maxDuration = layerDuration;
+
+            if (delayMs > 0) setTimeout(scheduleLayer, delayMs);
+            else scheduleLayer();
+        }
+
+        // Cleanup all nodes after the sound finishes
+        setTimeout(() => allNodes.forEach(n => { try { n.dispose(); } catch(_) {} }), maxDuration * 1000 + 500);
+    }
+};
+
+// ── STATE ──
+const gameState = {
+    hp: 100,
+    soul: 80,
+    armySize: 0,
+    armyMax: 20,
+    location: 'Northern Pass',
+    region: 'Greyfall',
+    turn: 0,
+    standing: { ashwood: 0, greyfall: 0, heartlands: 0, coast: 0 },
+    army: [],
+    oaths: [],
+    mapNodes: [
+        { id: 'start', label: 'Northern Pass', region: 'greyfall', x: 0.45, y: 0.35, status: 'current', connections: [] }
+    ],
+    currentSpellSchool: 'summoning'
+};
+
+const spells = {
+    summoning: [
+        { name: 'Raise Dead', school: 'Summoning', cost: '15 Soul' },
+        { name: 'Call Spirit', school: 'Summoning', cost: '20 Soul' },
+        { name: 'Bind Wraith', school: 'Summoning', cost: '25 Soul' },
+        { name: 'Mass Rising', school: 'Summoning', cost: '40 Soul' },
+    ],
+    corruption: [
+        { name: 'Soul Drain', school: 'Corruption', cost: '12 Soul' },
+        { name: 'Wither', school: 'Corruption', cost: '18 Soul' },
+        { name: 'Void Touch', school: 'Corruption', cost: '22 Soul' },
+        { name: 'Necrotic Burst', school: 'Corruption', cost: '30 Soul' },
+    ],
+    warding: [
+        { name: 'Death Ward', school: 'Warding', cost: '10 Soul' },
+        { name: 'Seal Breach', school: 'Warding', cost: '25 Soul' },
+        { name: 'Bone Armor', school: 'Warding', cost: '15 Soul' },
+        { name: 'Null Field', school: 'Warding', cost: '35 Soul' },
+    ],
+    mastery: [
+        { name: 'Memory Read', school: 'Mastery', cost: '8 Soul' },
+        { name: 'Soul Harvest', school: 'Mastery', cost: '20 Soul' },
+        { name: 'Ancient Rite', school: 'Mastery', cost: '30 Soul' },
+        { name: 'Zalekindor\'s Bane', school: 'Mastery', cost: '60 Soul' },
+    ]
+};
+
+let conversationLog = [];
+let turnCount = 0;
+
+// ── INIT ──
+function init() {
+    tts.load();
+    renderSpells('summoning');
+    drawMap();
+    updateUI();
+    const opening = `The wind comes down from the Greyfall highlands carrying the smell of cold stone and something older — a wrongness in the air that Morgar has learned to read like weather.\n\nThe tear opened three days ago at the Northern Pass. Small, as tears go. A ragged seam in the fabric of the world, barely wide enough for the things that have been spilling through. Two border soldiers are already dead. A shepherd's dog. Something else that left marks in the rock no natural creature makes.\n\nMorgar stands at the edge of the settlement's torchlight, looking north. Bonehelm and Silt, two of his older risen — a soldier and a quarryman — wait behind him in the dark, patient as only the dead can be. Somewhere above, the tear pulses with a light that has no color.\n\nThe village headman is watching from his doorway, lantern in hand, certain that the thing he hired is only marginally better than the things he hired it to stop.`;
+    displayMessage(opening, null);
+}
+
+window.addEventListener('DOMContentLoaded', init);
+
+// ── TABS ──
+function switchLeftTab(tab, btn) {
+    document.querySelectorAll('.panel-left .tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel-left > .panel-tabs .panel-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    btn.classList.add('active');
+}
+
+function switchSpellSchool(school, btn) {
+    document.querySelectorAll('#tab-grimoire .panel-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    gameState.currentSpellSchool = school;
+    renderSpells(school);
+}
+
+// ── SPELLS ──
+function renderSpells(school) {
+    const list = document.getElementById('spell-list');
+    list.innerHTML = '';
+    spells[school].forEach(spell => {
+        const el = document.createElement('div');
+        el.className = 'spell-item';
+        el.innerHTML = `
+            <div class="spell-info">
+                <div class="spell-school">${spell.school}</div>
+                <div class="spell-name">${spell.name}</div>
+            </div>
+            <div class="spell-cost">${spell.cost}</div>
+        `;
+        el.onclick = () => castSpell(spell.name);
+        list.appendChild(el);
+    });
+}
+
+function castSpell(name) {
+    const input = document.getElementById('action-input');
+    input.value = `Cast ${name}`;
+    input.focus();
+}
+
+// ── MAP ──
+const regionColors = {
+    greyfall: '#3d2060',
+    ashwood: '#1a3d20',
+    heartlands: '#3d2a10',
+    coast: '#102a3d',
+};
+
+const statusColors = {
+    current: '#7c4dff',
+    safe: '#3d9b52',
+    threatened: '#cc8800',
+    consumed: '#440000',
+    unknown: '#2a2a3a'
+};
+
+function drawMap() {
+    const canvas = document.getElementById('map-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Dark background
+    ctx.fillStyle = '#030507';
+    ctx.fillRect(0, 0, W, H);
+
+    // Fog texture
+    for (let i = 0; i < 800; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        ctx.fillStyle = `rgba(124,77,255,${Math.random() * 0.02})`;
+        ctx.fillRect(x, y, 1, 1);
+    }
+
+    // Region labels (background)
+    const regions = [
+        { name: 'ASHWOOD', x: 0.25, y: 0.25, color: regionColors.ashwood },
+        { name: 'GREYFALL', x: 0.72, y: 0.22, color: regionColors.greyfall },
+        { name: 'HEARTLANDS', x: 0.45, y: 0.65, color: regionColors.heartlands },
+        { name: 'DROWNED COAST', x: 0.22, y: 0.78, color: regionColors.coast },
+    ];
+
+    regions.forEach(r => {
+        ctx.fillStyle = r.color + '20';
+        ctx.font = '7px Share Tech Mono';
+        ctx.fillStyle = r.color + '80';
+        ctx.fillText(r.name, r.x * W - 20, r.y * H);
+    });
+
+    // Draw connections
+    gameState.mapNodes.forEach(node => {
+        node.connections.forEach(targetId => {
+            const target = gameState.mapNodes.find(n => n.id === targetId);
+            if (target) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#1a2030';
+                ctx.lineWidth = 1;
+                ctx.moveTo(node.x * W, node.y * H);
+                ctx.lineTo(target.x * W, target.y * H);
+                ctx.stroke();
+            }
+        });
+    });
+
+    // Draw tear (void pulse)
+    const tearPulse = (Date.now() % 2000) / 2000;
+    ctx.beginPath();
+    ctx.arc(0.45 * W, 0.2 * H, 4 + tearPulse * 3, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(170,68,255,${0.4 + tearPulse * 0.4})`;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(0.45 * W, 0.2 * H, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#aa44ff';
+    ctx.fill();
+
+    // Draw nodes
+    gameState.mapNodes.forEach(node => {
+        const x = node.x * W;
+        const y = node.y * H;
+        const color = statusColors[node.status] || statusColors.unknown;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = color + '80';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.font = '7px Share Tech Mono';
+        ctx.fillStyle = '#c8c0b8aa';
+        ctx.fillText(node.label, x + 6, y + 3);
+    });
+
+    requestAnimationFrame(drawMap);
+}
+
+// ── DISPLAY ──
+function displayMessage(narrative, playerAction, signal) {
+    const body = document.getElementById('chronicle-body');
+    const block = document.createElement('div');
+    block.className = 'message-block';
+
+    let html = '';
+    if (playerAction) {
+        html += `<div class="message-player"><span>Morgar ›</span>${playerAction}</div>`;
+    }
+    if (narrative) {
+        const parsed = narrative.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+        html += `<div class="message-narrative">${parsed}</div>`;
+    }
+    if (signal) {
+        html += `<div class="message-signal">${signal}</div>`;
+    }
+
+    block.innerHTML = html;
+    body.appendChild(block);
+    body.scrollTop = body.scrollHeight;
+
+    // Narrate the narrative text (not the player action or signal)
+    if (narrative) tts.speak(narrative);
+}
+
+// ── UI ──
+function updateUI() {
+    document.getElementById('hp-val').textContent = gameState.hp;
+    document.getElementById('soul-val').textContent = gameState.soul;
+    document.getElementById('army-size').textContent = gameState.armySize;
+    document.getElementById('army-count-label').textContent = gameState.armySize;
+    document.getElementById('army-bar').style.width = `${(gameState.armySize / gameState.armyMax) * 100}%`;
+    document.getElementById('current-location').textContent = gameState.location;
+    document.getElementById('current-region').textContent = gameState.region;
+    document.getElementById('current-location-header').textContent = gameState.location.toUpperCase();
+    document.getElementById('turn-counter').textContent = gameState.turn;
+
+    // Standing
+    ['ashwood', 'greyfall', 'heartlands', 'coast'].forEach(r => {
+        const el = document.getElementById(`stand-${r}`);
+        const val = gameState.standing[r];
+        el.textContent = val > 0 ? `+${val}` : val;
+        el.className = 'standing-val' + (val > 0 ? ' pos' : val < 0 ? ' neg' : '');
+    });
+
+    // Oaths
+    renderOaths();
+
+    // Army list
+    renderArmyList();
+}
+
+function renderArmyList() {
+    const list = document.getElementById('army-list');
+    if (gameState.army.length === 0) {
+        list.innerHTML = `<div style="padding:16px 12px; font-family:var(--font-prose); font-size:0.8rem; color:var(--text-dim); font-style:italic;">No dead have been raised. The void consumes them instead.</div>`;
+        return;
+    }
+    list.innerHTML = gameState.army.map(unit => `
+        <div class="unit-entry">
+            <div class="unit-name">${unit.name}</div>
+            <div class="unit-was">Was: ${unit.was} · ${unit.region}</div>
+            <div class="unit-memory">"${unit.memory}"</div>
+            <div class="unit-hp">HP: ${unit.hp} · ${unit.type}</div>
+        </div>
+    `).join('');
+}
+
+function renderOaths() {
+    const list = document.getElementById('oaths-list');
+    if (gameState.oaths.length === 0) {
+        list.innerHTML = `<div class="oath-empty">No vow has been sworn. The dead are unburdened.</div>`;
+        return;
+    }
+    list.innerHTML = gameState.oaths.map(oath => `
+        <div class="oath-card ${oath.status === 'complete' ? 'completed' : ''}">
+            <div class="oath-title ${oath.status === 'complete' ? 'completed' : ''}">${oath.title}</div>
+            <div class="oath-desc">${oath.desc}</div>
+            ${oath.pay ? `<div class="oath-desc" style="color:var(--accent-bone-dim); margin-top:2px;">Pay: ${oath.pay}</div>` : ''}
+            <div class="oath-status ${oath.status}">${oath.status.toUpperCase()}</div>
+        </div>
+    `).join('');
+}
+
+// ── PARSE TAGS ──
+function parseTags(text) {
+    // Army raise
+    const raiseMatch = text.match(/\[RAISE:\s*([^|]+)\|\s*WAS:\s*([^|]+)\|\s*MEM:\s*([^\]]+)\]/i);
+    if (raiseMatch) {
+        gameState.army.push({
+            name: raiseMatch[1].trim(),
+            was: raiseMatch[2].trim(),
+            region: gameState.region,
+            memory: raiseMatch[3].trim(),
+            hp: 100,
+            type: 'Risen'
+        });
+        gameState.armySize = gameState.army.length;
+    }
+
+    // HP change
+    const hpMatch = text.match(/\[HP:\s*([+-]?\d+)\]/i);
+    if (hpMatch) gameState.hp = Math.max(0, Math.min(100, gameState.hp + parseInt(hpMatch[1])));
+
+    // Soul change
+    const soulMatch = text.match(/\[SOUL:\s*([+-]?\d+)\]/i);
+    if (soulMatch) gameState.soul = Math.max(0, Math.min(100, gameState.soul + parseInt(soulMatch[1])));
+
+    // Location
+    const locMatch = text.match(/\[LOC:\s*([^|]+)(?:\|\s*([^\]]+))?\]/i);
+    if (locMatch) {
+        gameState.location = locMatch[1].trim();
+        if (locMatch[2]) gameState.region = locMatch[2].trim();
+        addMapNode(gameState.location, gameState.region);
+    }
+
+    // Standing
+    const standMatches = [...text.matchAll(/\[STAND:\s*([^|]+)\|\s*([+-]?\d+)\]/gi)];
+    standMatches.forEach(m => {
+        const region = m[1].trim().toLowerCase();
+        const change = parseInt(m[2]);
+        if (region.includes('ash')) gameState.standing.ashwood += change;
+        else if (region.includes('grey')) gameState.standing.greyfall += change;
+        else if (region.includes('heart')) gameState.standing.heartlands += change;
+        else if (region.includes('coast') || region.includes('drown')) gameState.standing.coast += change;
+    });
+
+    // Vow start: [Vow_Start: <n> | Obj: <task> | Pay: <g>]
+    const vowStartMatch = text.match(/\[Vow_Start:\s*([^|]+)\|\s*Obj:\s*([^|]+)\|\s*Pay:\s*([^\]]+)\]/i);
+    if (vowStartMatch) {
+        gameState.oaths.push({
+            title: vowStartMatch[1].trim(),
+            desc: vowStartMatch[2].trim(),
+            pay: vowStartMatch[3].trim(),
+            status: 'active'
+        });
+    }
+
+    // Vow end: [Vow_End: <n> | Obj: <task> | Pay: <g>]
+    const vowEndMatch = text.match(/\[Vow_End:\s*([^|]+)\|\s*Obj:\s*([^|]+)\|\s*Pay:\s*([^\]]+)\]/i);
+    if (vowEndMatch) {
+        const title = vowEndMatch[1].trim().toLowerCase();
+        const vow = gameState.oaths.find(o => o.title.toLowerCase() === title);
+        if (vow) {
+            vow.status = 'complete';
+            vow.pay = vowEndMatch[3].trim();
+        }
+    }
+
+    // Combat: [Combat: Start] or [Combat: End]
+    const combatMatch = text.match(/\[Combat:\s*(Start|End)\]/i);
+    if (combatMatch) {
+        gameState.inCombat = combatMatch[1].toLowerCase() === 'start';
+        // Hook for future music trigger
+        document.dispatchEvent(new CustomEvent('necro:combat', { detail: { active: gameState.inCombat } }));
+    }
+
+    // SFX — content is a JSON object/array, so match from first { or [ to last } or ]
+    const sfxMatch = text.match(/\[SFX:\s*(\{[\s\S]*\}|\[[\s\S]*\])\s*\]/i);
+    if (sfxMatch) spellSFX.play(sfxMatch[1].trim());
+
+    // Signal
+    const signalMatch = text.match(/\[SIGNAL:\s*([^\]]+)\]/i);
+    return signalMatch ? signalMatch[1].trim() : null;
+}
+
+function addMapNode(label, region) {
+    const exists = gameState.mapNodes.find(n => n.label.toLowerCase() === label.toLowerCase());
+    if (!exists) {
+        const regionKey = region.toLowerCase().replace(/\s+/g, '');
+        const regionPositions = {
+            ashwood: [0.15 + Math.random() * 0.25, 0.15 + Math.random() * 0.35],
+            greyfall: [0.6 + Math.random() * 0.3, 0.1 + Math.random() * 0.3],
+            heartlands: [0.35 + Math.random() * 0.3, 0.5 + Math.random() * 0.3],
+            drownedcoast: [0.1 + Math.random() * 0.3, 0.6 + Math.random() * 0.3],
+        };
+        const pos = regionPositions[regionKey] || [0.3 + Math.random() * 0.4, 0.3 + Math.random() * 0.4];
+        const prevNode = gameState.mapNodes[gameState.mapNodes.length - 1];
+        const newNode = { id: `node_${Date.now()}`, label, region, x: pos[0], y: pos[1], status: 'safe', connections: [prevNode.id] };
+        prevNode.connections.push(newNode.id);
+        gameState.mapNodes.push(newNode);
+    }
+    // Set current
+    gameState.mapNodes.forEach(n => { if (n.status === 'current') n.status = 'safe'; });
+    const current = gameState.mapNodes.find(n => n.label.toLowerCase() === label.toLowerCase());
+    if (current) current.status = 'current';
+}
+
+function stripTags(text) {
+    return text
+        .replace(/\[RAISE:[^\]]+\]/gi, '')
+        .replace(/\[HP:[^\]]+\]/gi, '')
+        .replace(/\[SOUL:[^\]]+\]/gi, '')
+        .replace(/\[LOC:[^\]]+\]/gi, '')
+        .replace(/\[STAND:[^\]]+\]/gi, '')
+        .replace(/\[Vow_Start:[^\]]+\]/gi, '')
+        .replace(/\[Vow_End:[^\]]+\]/gi, '')
+        .replace(/\[Combat:[^\]]+\]/gi, '')
+        .replace(/\[SFX:\s*[\s\S]*?(?:\}|\])\s*\]/gi, '')
+        .replace(/\[SIGNAL:[^\]]+\]/gi, '')
+        .replace(/\[GENERATE_IMAGE:[^\]]+\]/gi, '')
+        .trim();
+}
+
+// ── AI ──
+const SYSTEM_PROMPT = `You are the narrator of a dark fantasy necromancer game.
+
+Morgar is a veteran necromancer of an ancient, mythic order. He fights void creatures — servants of Zalekindor, a Demon King who has torn holes (Tears) between realities. 
+These tears are opening across the dying kingdom of Ashwood, Greyfall, Heartlands, and Drowned Coast.
+
+## MORGAR
+- A veteran. Weathered, precise, unhurried. Has done this before.
+- Commands an army of risen dead, each with their own memory and history.
+- The void cannot be raised — void creatures have no self, no memory, nothing to anchor them.
+- Feared by the living he protects. Accepted by necessity.
+
+## VOICE
+Third-person. Dark, precise, atmospheric. No overwrought flourishes.
+100-180 words per response. Let weight exist.
+
+## ARMY MECHANIC
+When Morgar defeats an enemy (not a void creature), he may raise it.
+Emit: [RAISE: Name | WAS: What they were | MEM: One sentence memory fragment]
+Example: [RAISE: Aldric | WAS: Border Guard, Greyfall | MEM: He remembers the smell of bread from the garrison kitchen every morning.]
+
+## THE VOID
+Void creatures have no memory. They cannot be raised.
+They serve Zalekindor. They erase rather than kill.
+
+## STATE TAGS (emit at end, only if changed)
+[HP: +/-N] — Morgar's vitality
+[SOUL: +/-N] — Soul energy (casting resource)
+[LOC: Location Name | Region] — When Morgar moves
+[STAND: Region | +/-N] — Regional standing change
+[Vow_Start: <name> | Obj: <task description> | Pay: <reward>] — When Morgar accepts or swears a vow
+[Vow_End: <name> | Obj: <task description> | Pay: <reward>] — When a vow is fulfilled, broken, or lost
+[Combat: Start] — When combat begins
+[Combat: End] — When combat ends
+[SIGNAL: One atmospheric observation. The world noticing itself.]
+
+## REGIONS
+- Ashwood: Ancient forest, void consuming from within. Druids, spirits, sacred places.
+- Greyfall: Rocky northern badlands. First tears appeared here. Mining towns, border forts.
+- Heartlands: The capital, noble houses, the kingdom's army. In denial about the void.
+- Drowned Coast: Southern fishing ports, marshes. Strange wet tears. Isolated.
+
+## GRIMOIRE — MORGAR'S SPELLS
+Morgar draws on Soul energy to cast. Deduct soul cost via [SOUL: -N] when a spell is used. Spells have consequences — casting drains him, and overuse courts collapse.
+
+**Summoning**
+- Raise Dead — 15 Soul. Animates a recently slain non-void corpse. Requires a body.
+- Call Spirit — 20 Soul. Summons a bound spirit for scouting or communion. Cannot fight.
+- Bind Wraith — 25 Soul. Enslaves a free-roaming wraith to Morgar's will.
+- Mass Rising — 40 Soul. Raises multiple corpses at once. Catastrophic if rushed.
+
+**Corruption**
+- Soul Drain — 12 Soul. Leaches life-force from a target, restoring Morgar's HP slightly.
+- Wither — 18 Soul. Decays flesh and weakens a living enemy over time.
+- Void Touch — 22 Soul. Corrupts a target with void-taint. Dangerous near tears.
+- Necrotic Burst — 30 Soul. Explosive release of death-energy. Damages all nearby.
+
+**Warding**
+- Death Ward — 10 Soul. Marks Morgar against one incoming killing blow.
+- Seal Breach — 25 Soul. Partially closes or stabilizes a void tear. Temporary.
+- Bone Armor — 15 Soul. Wraps Morgar in animated bone plating. Reduces HP loss.
+- Null Field — 35 Soul. Suppresses void activity in a small area. Exhausting to maintain.
+
+**Mastery**
+- Memory Read — 8 Soul. Reads the last memory of a corpse. Useful for intelligence.
+- Soul Harvest — 20 Soul. Extracts and stores soul energy from dying creatures.
+- Ancient Rite — 30 Soul. Invokes the old order's power. Effects vary by location.
+- Zalekindor's Bane — 60 Soul. A weapon of last resort. Morgar cannot cast this lightly.
+
+## SPELL SOUND EFFECTS
+When Morgar casts a spell, emit a Tone.js sound design as compact JSON inside an [SFX] tag. Each sound is an array of layers. Each layer has: synth (Tone.js synth params + notes, duration, sequence), noise (Tone.js NoiseSynth params + color, bursts), fx (reverb, distortion, chorus), delay, and totalDuration (seconds). Design the sound to match the spell's school and intensity.
+[SFX: [...layers] ]
+Only emit when a spell is actually cast. Keep JSON on one line.
+
+## STARTING LOCATION
+Greyfall, Northern Pass. Minor tear. Village headman watching from his doorway.
+Morgar has two risen: Bonehelm (former soldier) and Silt (former quarryman).
+
+Only emit tags that changed. All numbers whole integers.`;
+
+async function sendAction() {
+    const input = document.getElementById('action-input');
+    const action = input.value.trim();
+    if (!action) return;
+    input.value = '';
+
+    gameState.turn++;
+    turnCount++;
+
+    conversationLog.push({ role: 'user', content: action });
+
+    document.getElementById('loading').classList.add('visible');
+    document.querySelector('.btn-submit').disabled = true;
+
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+                system_prompt: SYSTEM_PROMPT,
+                context: '',
+                player_action: action
+            })
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        const responseText = data.text;
+
+        conversationLog.push({ role: 'assistant', content: responseText });
+
+        const signal = parseTags(responseText);
+        const clean = stripTags(responseText);
+        displayMessage(clean, action, signal);
+        updateUI();
+
+    } catch (err) {
+        displayMessage(`The link to the chronicle falters. ${err.message}`, action, null);
+    }
+
+    document.getElementById('loading').classList.remove('visible');
+    document.querySelector('.btn-submit').disabled = false;
+    document.getElementById('chronicle-body').scrollTop = document.getElementById('chronicle-body').scrollHeight;
+}
+
+function handleKey(e) {
+    if (e.key === 'Enter') sendAction();
+}
+
+function requestVisualize() {
+    const input = document.getElementById('action-input');
+    input.value = '[Visualize the current scene]';
+    sendAction();
+}
+
+function saveGame() {
+    const save = JSON.stringify({ gameState, conversationLog, turnCount }, null, 2);
+    const blob = new Blob([save], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const timestamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+    a.href = url;
+    a.download = `necromancer_save_${timestamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function loadGame() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                const data = JSON.parse(evt.target.result);
+                if (!data.gameState || !data.conversationLog) {
+                    alert('Invalid save file.');
+                    return;
+                }
+                Object.assign(gameState, data.gameState);
+                conversationLog = data.conversationLog;
+                turnCount = data.turnCount || 0;
+                updateUI();
+                // Rebuild chronicle display
+                const body = document.getElementById('chronicle-body');
+                body.innerHTML = '';
+                for (let i = 0; i < conversationLog.length; i += 2) {
+                    const playerMsg = conversationLog[i]?.content;
+                    const aiMsg = conversationLog[i + 1]?.content;
+                    if (aiMsg) {
+                        const signal = parseTags(aiMsg);
+                        displayMessage(stripTags(aiMsg), playerMsg, signal);
+                    }
+                }
+            } catch (err) {
+                alert('Failed to load save: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    };
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+}
+</script>
+</body>
+</html>
