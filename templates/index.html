@@ -3,36 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NECROMANCER</title>
+<title>YOMI NO ONMYOJI</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 <style>
 :root {
-    --bg-void: #030507;
-    --bg-panel: #07090c;
-    --bg-panel-alt: #0a0d11;
-    --bg-entry: #0d1117;
-    --border: #1a2030;
-    --border-dim: #111820;
-    --border-void: #2a1535;
+    --bg-void: #050406;
+    --bg-panel: #0a080c;
+    --bg-panel-alt: #0d0a11;
+    --bg-entry: #110d15;
+    --border: #231b2b;
+    --border-dim: #18121f;
+    --border-void: #35152a;
 
-    --text-main: #c8c0b8;
-    --text-dim: #5a5550;
-    --text-bone: #e8e0d0;
-    --text-title: #d4c8b0;
+    --text-main: #c8b8b8;
+    --text-dim: #605050;
+    --text-bone: #e8d0d0;
+    --text-title: #d4b0b0;
 
-    --accent-soul: #7c4dff;
-    --accent-soul-dim: #3d1f80;
-    --accent-void: #4a0080;
-    --accent-rot: #2d6b3a;
-    --accent-rot-bright: #3d9b52;
+    --accent-soul: #d32f2f; /* Blood red for soul/blood-sutras */
+    --accent-soul-dim: #661414;
+    --accent-void: #80002a;
+    --accent-rot: #4a6b2d; /* Pale green/rot */
+    --accent-rot-bright: #6c9b3d;
     --accent-danger: #8b1a1a;
-    --accent-danger-bright: #cc2222;
-    --accent-bone: #c8b88a;
+    --accent-danger-bright: #e53935;
+    --accent-bone: #c8b88a; /* Old parchment/bamboo */
     --accent-bone-dim: #6b5f3a;
-    --accent-tear: #6600aa;
-    --accent-tear-bright: #aa44ff;
+    --accent-tear: #aa0033;
+    --accent-tear-bright: #ff3366;
     --accent-gold: #c8a830;
     --accent-gold-dim: #6b5510;
 
@@ -130,7 +130,7 @@ header {
 .panel-tab:hover { color: var(--accent-bone); }
 .panel-tab.active {
     color: var(--accent-soul);
-    background: rgba(124, 77, 255, 0.05);
+    background: rgba(211, 47, 47, 0.05);
     border-bottom: 1px solid var(--accent-soul);
 }
 
@@ -160,7 +160,7 @@ header {
     align-items: center;
 }
 
-.spell-item:hover { background: rgba(124, 77, 255, 0.06); }
+.spell-item:hover { background: rgba(211, 47, 47, 0.06); }
 
 .spell-info { display: flex; flex-direction: column; }
 
@@ -201,7 +201,7 @@ header {
     transition: background 0.15s;
 }
 
-.unit-entry:hover { background: rgba(45, 107, 58, 0.08); }
+.unit-entry:hover { background: rgba(108, 155, 61, 0.08); }
 
 .unit-name {
     font-family: var(--font-prose);
@@ -239,7 +239,7 @@ header {
 .ritual-section {
     border-top: 1px solid var(--border);
     padding: 10px 12px;
-    background: rgba(74, 0, 128, 0.04);
+    background: rgba(211, 47, 47, 0.04);
 }
 
 .ritual-label {
@@ -255,7 +255,7 @@ header {
 }
 
 .ritual-label::before {
-    content: '◆';
+    content: '⛩';
     color: var(--accent-soul);
     font-size: 0.5rem;
 }
@@ -280,7 +280,7 @@ header {
 .ritual-slot.active {
     color: var(--accent-tear-bright);
     border-color: var(--accent-tear);
-    background: rgba(102, 0, 170, 0.08);
+    background: rgba(170, 0, 51, 0.08);
 }
 
 .ritual-requires {
@@ -342,7 +342,7 @@ header {
     font-size: 0.6rem;
     letter-spacing: 3px;
     text-transform: uppercase;
-    background: rgba(124, 77, 255, 0.06);
+    background: rgba(211, 47, 47, 0.06);
     border: 1px solid var(--accent-soul-dim);
     color: var(--accent-soul);
     cursor: pointer;
@@ -351,7 +351,7 @@ header {
 }
 
 .btn-visualize:hover {
-    background: rgba(124, 77, 255, 0.15);
+    background: rgba(211, 47, 47, 0.15);
     border-color: var(--accent-soul);
 }
 
@@ -446,7 +446,7 @@ header {
     margin-top: 16px;
     padding: 6px 10px;
     border-left: 2px solid var(--accent-soul-dim);
-    background: rgba(124, 77, 255, 0.04);
+    background: rgba(211, 47, 47, 0.04);
 }
 
 /* IMAGE */
@@ -456,7 +456,7 @@ header {
     object-fit: cover;
     margin-bottom: 20px;
     border: 1px solid var(--border);
-    filter: saturate(0.7) contrast(1.1);
+    filter: sepia(0.4) saturate(0.8) contrast(1.1);
     display: block;
 }
 
@@ -498,7 +498,7 @@ header {
     letter-spacing: 3px;
     text-transform: uppercase;
     padding: 8px 16px;
-    background: rgba(124, 77, 255, 0.08);
+    background: rgba(211, 47, 47, 0.08);
     border: 1px solid var(--accent-soul-dim);
     color: var(--accent-soul);
     cursor: pointer;
@@ -507,7 +507,7 @@ header {
 }
 
 .btn-submit:hover {
-    background: rgba(124, 77, 255, 0.2);
+    background: rgba(211, 47, 47, 0.2);
     border-color: var(--accent-soul);
 }
 
@@ -602,7 +602,6 @@ header {
 .stat-bar-fill.soul { background: var(--accent-soul); box-shadow: 0 0 6px var(--accent-soul); }
 .stat-bar-fill.danger { background: var(--accent-danger-bright); box-shadow: 0 0 6px var(--accent-danger); }
 .stat-bar-fill.rot { background: var(--accent-rot-bright); box-shadow: 0 0 6px var(--accent-rot); }
-.stat-bar-fill.void { background: var(--accent-tear-bright); box-shadow: 0 0 6px var(--accent-tear); }
 
 /* VITALS BOXES */
 .vitals-grid {
@@ -784,8 +783,6 @@ header {
     100% { opacity: 0.4; }
 }
 
-.void-active { animation: voidPulse 2s infinite; }
-
 /* TAB CONTENT */
 .tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; }
 .tab-content.active { display: flex; }
@@ -803,16 +800,14 @@ header {
 }
 
 .loading-indicator.visible { display: block; }
-
-
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <header>
-    <div class="header-title">Necromancer</div>
-    <div class="header-meta">LOCATION: <span id="current-location-header">GREYFALL</span></div>
+    <div class="header-title">YOMI NO ONMYOJI</div>
+    <div class="header-meta">LOCATION: <span id="current-location-header">HAI-DAKE</span></div>
     <div style="display:flex; align-items:center; gap:12px;">
         <div style="display:flex; align-items:center; gap:4px;">
             <button id="music-toggle" onclick="musicEngine.toggle()" style="
@@ -864,7 +859,7 @@ header {
     <!-- LEFT: GRIMOIRE / BESTIARY -->
     <div class="panel-left">
         <div class="panel-tabs">
-            <button class="panel-tab active" onclick="switchLeftTab('grimoire', this)">Grimoire</button>
+            <button class="panel-tab active" onclick="switchLeftTab('grimoire', this)">Sutras</button>
             <button class="panel-tab" onclick="switchLeftTab('bestiary', this)">Army</button>
         </div>
 
@@ -883,9 +878,9 @@ header {
 
             <!-- RITUAL SECTION -->
             <div class="ritual-section">
-                <div class="ritual-label">Ritual Circle</div>
+                <div class="ritual-label">Ofuda Ritual</div>
                 <div class="ritual-slot active" id="ritual-slot-1" onclick="selectRitualSlot('ritual-slot-1')">
-                    <div style="color:var(--accent-tear-bright); font-size:0.8rem;">Soul Binding</div>
+                    <div style="color:var(--accent-tear-bright); font-size:0.8rem;">Blood-Sutra Binding</div>
                     <div class="ritual-requires">Requires: 3 Risen · Major Soul</div>
                 </div>
                 <div class="ritual-slot" id="ritual-slot-2" onclick="selectRitualSlot('ritual-slot-2')">No ritual prepared</div>
@@ -904,7 +899,7 @@ header {
             <div class="panel-section-label">Risen Dead — <span id="army-count-label">0</span> units</div>
             <div class="bestiary-list" id="army-list">
                 <div style="padding:16px 12px; font-family:var(--font-prose); font-size:0.8rem; color:var(--text-dim); font-style:italic;">
-                    No dead have been raised. The demons hold the field.
+                    No dead have been raised. The Oni hold the field.
                 </div>
             </div>
             <div class="panel-bottom-btns">
@@ -949,11 +944,11 @@ header {
                 <div class="section-label">Status</div>
                 <div class="status-row">
                     <span class="status-row-label">Location</span>
-                    <span class="status-row-value" id="current-location">Greyfall</span>
+                    <span class="status-row-value" id="current-location">Northern Pass</span>
                 </div>
                 <div class="status-row" style="margin-bottom:8px;">
                     <span class="status-row-label">Region</span>
-                    <span class="status-row-value soul" id="current-region">Greyfall</span>
+                    <span class="status-row-value soul" id="current-region">Hai-dake</span>
                 </div>
                 <div class="vitals-grid">
                     <div class="vital-box">
@@ -967,7 +962,7 @@ header {
                 </div>
                 <div class="vitals-grid" style="margin-top:6px;">
                     <div class="vital-box" style="grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between; padding:6px 10px;">
-                        <div class="vital-box-label" style="margin-bottom:0;">Gold</div>
+                        <div class="vital-box-label" style="margin-bottom:0;">Ryo (Gold)</div>
                         <div class="vital-box-value gold" style="font-size:0.9rem;">⬡ <span id="gold-val">100</span></div>
                     </div>
                 </div>
@@ -987,28 +982,28 @@ header {
             <div class="standing-section">
                 <div class="section-label">Regional Standing</div>
                 <div class="standing-row">
-                    <span class="standing-name">Ashwood</span>
-                    <span class="standing-val" id="stand-ashwood">0</span>
+                    <span class="standing-name">Kuro-mori</span>
+                    <span class="standing-val" id="stand-kuromori">0</span>
                 </div>
                 <div class="standing-row">
-                    <span class="standing-name">Greyfall</span>
-                    <span class="standing-val" id="stand-greyfall">0</span>
+                    <span class="standing-name">Hai-dake</span>
+                    <span class="standing-val" id="stand-haidake">0</span>
                 </div>
                 <div class="standing-row">
-                    <span class="standing-name">Heartlands</span>
-                    <span class="standing-val" id="stand-heartlands">0</span>
+                    <span class="standing-name">Miyako</span>
+                    <span class="standing-val" id="stand-miyako">0</span>
                 </div>
                 <div class="standing-row">
-                    <span class="standing-name">Drowned Coast</span>
-                    <span class="standing-val" id="stand-coast">0</span>
+                    <span class="standing-name">Yomi-hama</span>
+                    <span class="standing-val" id="stand-yomihama">0</span>
                 </div>
             </div>
 
             <!-- OATHS -->
             <div class="oaths-section">
-                <div class="section-label">Oaths Sworn</div>
+                <div class="section-label">Vows Sworn</div>
                 <div id="oaths-list">
-                    <div class="oath-empty">No oath has been sworn. The dead are unburdened.</div>
+                    <div class="oath-empty">No vow has been sworn. The dead are unburdened.</div>
                 </div>
             </div>
 
@@ -1135,7 +1130,7 @@ const spellSFX = {
                     const s = layer.synth;
                     const poly = Array.isArray(s.notes) && s.notes.length > 1;
                     let synth;
-                    if (s.type === 'metal') {
+                    if (s.type === 'metal' || s.type === 'MetalSynth') {
                         synth = new Tone.MetalSynth({
                             frequency:       s.frequency      ?? 200,
                             harmonicity:     s.harmonicity    ?? 5.1,
@@ -1171,8 +1166,8 @@ const spellSFX = {
                     }
                 }
 
-                if (layer.noise) {
-                    const n = layer.noise;
+                if (layer.noise || layer.type === 'NoiseSynth') {
+                    const n = layer.noise || layer;
                     const noise = new Tone.NoiseSynth({
                         noise: { type: n.color ?? 'white' },
                         envelope: { attack: n.attack ?? 0.01, decay: n.decay ?? 0.3, sustain: n.sustain ?? 0, release: n.release ?? 0.2 }
@@ -1205,46 +1200,46 @@ const gameState = {
     armyMax: 20,
     gold: 100,
     location: 'Northern Pass',
-    region: 'Greyfall',
+    region: 'Hai-dake',
     turn: 0,
-    standing: { ashwood: 0, greyfall: 0, heartlands: 0, coast: 0 },
+    standing: { kuromori: 0, haidake: 0, miyako: 0, yomihama: 0 },
     army: [
-        { name: 'Bonehelm', was: 'Border Soldier, Greyfall', mem: 'He remembers the weight of his shield on long marches north.', hp: 140, type: 'Risen' },
-        { name: 'Silt', was: 'Quarryman, Greyfall', mem: 'He remembers the sound the stone made when it finally gave way.', hp: 108, type: 'Risen' }
+        { name: 'Kabuto', was: 'Ashigaru, Hai-dake', mem: 'He remembers the smell of blood and wet earth on his rusted katana.', hp: 140, type: 'Risen' },
+        { name: 'Doro', was: 'Quarryman, Hai-dake', mem: 'He remembers the weight of the stone wheel crushing his chest.', hp: 108, type: 'Risen' }
     ],
     inventory: [],
     oaths: [],
     active_oath: null,
     mapNodes: [
-        { id: 'start', label: 'Northern Pass', region: 'greyfall', x: 0.45, y: 0.35, status: 'current', connections: [] }
+        { id: 'start', label: 'Northern Pass', region: 'haidake', x: 0.65, y: 0.25, status: 'current', connections: [] }
     ],
     currentSpellSchool: 'summoning'
 };
 
 const spells = {
     summoning: [
-        { name: 'Raise Dead', school: 'Summoning', cost: '15 Soul' },
-        { name: 'Call Spirit', school: 'Summoning', cost: '20 Soul' },
-        { name: 'Bind Wraith', school: 'Summoning', cost: '25 Soul' },
+        { name: 'Yomi Call', school: 'Summoning', cost: '15 Soul' },
+        { name: 'Call Shikigami', school: 'Summoning', cost: '20 Soul' },
+        { name: 'Bind Yurei', school: 'Summoning', cost: '25 Soul' },
         { name: 'Mass Rising', school: 'Summoning', cost: '40 Soul' },
     ],
     corruption: [
         { name: 'Soul Drain', school: 'Corruption', cost: '12 Soul' },
         { name: 'Wither', school: 'Corruption', cost: '18 Soul' },
-        { name: 'Void Touch', school: 'Corruption', cost: '22 Soul' },
+        { name: 'Kegare Siphon', school: 'Corruption', cost: '22 Soul' },
         { name: 'Necrotic Burst', school: 'Corruption', cost: '30 Soul' },
     ],
     warding: [
         { name: 'Death Ward', school: 'Warding', cost: '10 Soul' },
-        { name: 'Seal Breach', school: 'Warding', cost: '25 Soul' },
-        { name: 'Bone Armor', school: 'Warding', cost: '15 Soul' },
-        { name: 'Null Field', school: 'Warding', cost: '35 Soul' },
+        { name: 'Seal Torii', school: 'Warding', cost: '25 Soul' },
+        { name: 'Corpse Armor', school: 'Warding', cost: '15 Soul' },
+        { name: 'Yokai Ward', school: 'Warding', cost: '35 Soul' },
     ],
     mastery: [
-        { name: 'Memory Read', school: 'Mastery', cost: '8 Soul' },
-        { name: 'Soul Harvest', school: 'Mastery', cost: '20 Soul' },
-        { name: 'Ancient Rite', school: 'Mastery', cost: '30 Soul' },
-        { name: 'Zalekindor\'s Bane', school: 'Mastery', cost: '60 Soul' },
+        { name: 'Soul Echo', school: 'Mastery', cost: '8 Soul' },
+        { name: 'Spirit Harvest', school: 'Mastery', cost: '20 Soul' },
+        { name: 'Bind Oni', school: 'Mastery', cost: '30 Soul' },
+        { name: 'Zan-Kuroda\'s Bane', school: 'Mastery', cost: '60 Soul' },
     ]
 };
 
@@ -1257,10 +1252,10 @@ function init() {
     renderSpells('summoning');
     drawMap();
     updateUI();
-    const opening = `The wind comes down from the Greyfall highlands carrying the smell of cold stone and something older — a wrongness in the air that Morgar has learned to read like weather.\n\nThe tear opened three days ago at the Northern Pass. Small, as tears go. A ragged seam in the fabric of the world, barely wide enough for the things that have been spilling through. Two border soldiers are already dead. A shepherd's dog. Something else that left marks in the rock no natural creature makes.\n\nMorgar stands at the edge of the settlement's torchlight, looking north. Bonehelm and Silt, two of his older risen — a soldier and a quarryman — wait behind him in the dark, patient as only the dead can be. Somewhere above, the tear pulses with a light that has no color.\n\nThe village headman is watching from his doorway, lantern in hand, certain that the thing he hired is only marginally better than the things he hired it to stop.`;
+    const opening = `The wind howls down from the Hai-dake peaks, carrying the stench of rusted iron and something older — a deep kegare (defilement) that Morikage has learned to read like the changing seasons.\n\nThe Yomi-gate tore open three days ago in the ruins of a shukuba (post town) at the Northern Pass. A ragged, bleeding Torii gate, barely wide enough for the horrors spilling through. Two samurai border guards are already dead. A merchant's horse. Something else that left claw marks in the stone no natural beast could make.\n\nMorikage stands at the edge of the dying watch-fire, looking north. Kabuto and Doro, two of his older risen — a shattered ashigaru and a crushed quarryman — wait behind him in the freezing mist, patient as only the dead can be. Somewhere above, the twisted Torii pulses with a sickly, colorless light.\n\nThe village headman watches from his tatami room, clutching a useless paper amulet, certain that the heretic he hired is only marginally better than the Yokai he hired it to stop.`;
     displayMessage(opening, null);
 
-    const startingOath = { title: 'Seal the Northern Pass Tear', desc: 'The headman has hired Morgar to close the tear and stop whatever is coming through. The village will not survive another three days.', pay: '40g', status: 'active' };
+    const startingOath = { title: 'Seal the Northern Pass Torii', desc: 'The headman has hired Morikage to close the bleeding gate and stop whatever is coming through. The village will not survive another three days.', pay: '40 Ryo', status: 'active' };
     gameState.oaths.push(startingOath);
     gameState.active_oath = startingOath;
     updateUI();
@@ -1334,15 +1329,15 @@ function prepareRitual() {
 
 // ── MAP ──
 const regionColors = {
-    greyfall: '#3d2060',
-    ashwood: '#1a3d20',
-    heartlands: '#3d2a10',
-    coast: '#102a3d',
+    haidake: '#3a2b45',
+    kuromori: '#203d26',
+    miyako: '#4d2323',
+    yomihama: '#1c3a4d',
 };
 
 const statusColors = {
-    current: '#7c4dff',
-    safe: '#3d9b52',
+    current: '#d32f2f',
+    safe: '#6c9b3d',
     threatened: '#cc8800',
     consumed: '#440000',
     unknown: '#2a2a3a'
@@ -1355,21 +1350,21 @@ function drawMap() {
 
     ctx.clearRect(0, 0, W, H);
 
-    ctx.fillStyle = '#030507';
+    ctx.fillStyle = '#050406';
     ctx.fillRect(0, 0, W, H);
 
     for (let i = 0; i < 800; i++) {
         const x = Math.random() * W;
         const y = Math.random() * H;
-        ctx.fillStyle = `rgba(124,77,255,${Math.random() * 0.02})`;
+        ctx.fillStyle = `rgba(211,47,47,${Math.random() * 0.02})`;
         ctx.fillRect(x, y, 1, 1);
     }
 
     const regions = [
-        { name: 'ASHWOOD', x: 0.25, y: 0.25, color: regionColors.ashwood },
-        { name: 'GREYFALL', x: 0.72, y: 0.22, color: regionColors.greyfall },
-        { name: 'HEARTLANDS', x: 0.45, y: 0.65, color: regionColors.heartlands },
-        { name: 'DROWNED COAST', x: 0.22, y: 0.78, color: regionColors.coast },
+        { name: 'KURO-MORI', x: 0.25, y: 0.25, color: regionColors.kuromori },
+        { name: 'HAI-DAKE', x: 0.72, y: 0.22, color: regionColors.haidake },
+        { name: 'MIYAKO', x: 0.45, y: 0.65, color: regionColors.miyako },
+        { name: 'YOMI-HAMA', x: 0.22, y: 0.78, color: regionColors.yomihama },
     ];
 
     regions.forEach(r => {
@@ -1384,7 +1379,7 @@ function drawMap() {
             const target = gameState.mapNodes.find(n => n.id === targetId);
             if (target) {
                 ctx.beginPath();
-                ctx.strokeStyle = '#1a2030';
+                ctx.strokeStyle = '#231b2b';
                 ctx.lineWidth = 1;
                 ctx.moveTo(node.x * W, node.y * H);
                 ctx.lineTo(target.x * W, target.y * H);
@@ -1395,12 +1390,12 @@ function drawMap() {
 
     const tearPulse = (Date.now() % 2000) / 2000;
     ctx.beginPath();
-    ctx.arc(0.45 * W, 0.2 * H, 4 + tearPulse * 3, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(170,68,255,${0.4 + tearPulse * 0.4})`;
+    ctx.arc(0.65 * W, 0.25 * H, 4 + tearPulse * 3, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(211,47,47,${0.4 + tearPulse * 0.4})`;
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(0.45 * W, 0.2 * H, 2, 0, Math.PI * 2);
-    ctx.fillStyle = '#aa44ff';
+    ctx.arc(0.65 * W, 0.25 * H, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff3366';
     ctx.fill();
 
     gameState.mapNodes.forEach(node => {
@@ -1417,7 +1412,7 @@ function drawMap() {
         ctx.stroke();
 
         ctx.font = '7px Share Tech Mono';
-        ctx.fillStyle = '#c8c0b8aa';
+        ctx.fillStyle = '#c8b8b8aa';
         ctx.fillText(node.label, x + 6, y + 3);
     });
 
@@ -1432,7 +1427,7 @@ function displayMessage(narrative, playerAction, signal, imageB64) {
 
     let html = '';
     if (playerAction) {
-        html += `<div class="message-player"><span>Morgar ›</span>${playerAction}</div>`;
+        html += `<div class="message-player"><span>Morikage ›</span>${playerAction}</div>`;
     }
     if (imageB64) {
         html += `<img class="scene-image" src="data:image/png;base64,${imageB64}" alt="Scene">`;
@@ -1462,8 +1457,9 @@ function updateUI() {
     document.getElementById('current-location-header').textContent = gameState.location.toUpperCase();
     document.getElementById('turn-counter').textContent = gameState.turn;
 
-    ['ashwood', 'greyfall', 'heartlands', 'coast'].forEach(r => {
+    ['kuromori', 'haidake', 'miyako', 'yomihama'].forEach(r => {
         const el = document.getElementById(`stand-${r}`);
+        if (!el) return;
         const val = gameState.standing[r];
         el.textContent = val > 0 ? `+${val}` : val;
         el.className = 'standing-val' + (val > 0 ? ' pos' : val < 0 ? ' neg' : '');
@@ -1477,7 +1473,7 @@ function updateUI() {
 function renderArmyList() {
     const list = document.getElementById('army-list');
     if (gameState.army.length === 0) {
-        list.innerHTML = `<div style="padding:16px 12px; font-family:var(--font-prose); font-size:0.8rem; color:var(--text-dim); font-style:italic;">No dead have been raised. The demons hold the field.</div>`;
+        list.innerHTML = `<div style="padding:16px 12px; font-family:var(--font-prose); font-size:0.8rem; color:var(--text-dim); font-style:italic;">No dead have been raised. The Oni hold the field.</div>`;
         return;
     }
     list.innerHTML = gameState.army.map(unit => `
@@ -1508,7 +1504,6 @@ function renderOaths() {
     const list = document.getElementById('oaths-list');
     if (!list) return;
 
-    // Filter the oaths so we only keep ones that aren't completed
     const activeOaths = gameState.oaths.filter(oath => oath.status !== 'complete');
 
     if (activeOaths.length === 0) {
@@ -1549,7 +1544,7 @@ function parseTags(text) {
 
     const standMatches = [...text.matchAll(/\[STAND:\s*([^|\]]+)\|\s*([+-]?\d+)\]/gi)];
     standMatches.forEach(m => {
-        const regionInput = m[1].trim().toLowerCase();
+        const regionInput = m[1].trim().toLowerCase().replace('-', '');
         const change = parseInt(m[2]);
         Object.keys(gameState.standing).forEach(key => {
             if (regionInput.includes(key)) gameState.standing[key] += change;
@@ -1620,7 +1615,7 @@ function parseTags(text) {
             region: gameState.region,
             memory: raiseMatch[3].trim(),
             hp: 100,
-            type: 'Risen'
+            type: 'Yomi-Risen'
         });
         gameState.armySize = gameState.army.length;
     }
@@ -1629,7 +1624,7 @@ function parseTags(text) {
     if (bindMatch) {
         gameState.army.push({
             name: bindMatch[1].trim(),
-            was: `Bound Demon — ${bindMatch[2].trim()}`,
+            was: `Bound Yokai — ${bindMatch[2].trim()}`,
             region: gameState.region,
             memory: bindMatch[3].trim(),
             hp: 100,
@@ -1665,12 +1660,12 @@ function parseTags(text) {
 function addMapNode(label, region) {
     const exists = gameState.mapNodes.find(n => n.label.toLowerCase() === label.toLowerCase());
     if (!exists) {
-        const regionKey = region.toLowerCase().replace(/\s+/g, '');
+        const regionKey = region.toLowerCase().replace(/[\s-]/g, '');
         const regionPositions = {
-            ashwood: [0.15 + Math.random() * 0.25, 0.15 + Math.random() * 0.35],
-            greyfall: [0.6 + Math.random() * 0.3, 0.1 + Math.random() * 0.3],
-            heartlands: [0.35 + Math.random() * 0.3, 0.5 + Math.random() * 0.3],
-            drownedcoast: [0.1 + Math.random() * 0.3, 0.6 + Math.random() * 0.3],
+            kuromori: [0.15 + Math.random() * 0.25, 0.15 + Math.random() * 0.35],
+            haidake: [0.6 + Math.random() * 0.3, 0.1 + Math.random() * 0.3],
+            miyako: [0.35 + Math.random() * 0.3, 0.5 + Math.random() * 0.3],
+            yomihama: [0.1 + Math.random() * 0.3, 0.6 + Math.random() * 0.3],
         };
         const pos = regionPositions[regionKey] || [0.3 + Math.random() * 0.4, 0.3 + Math.random() * 0.4];
         const prevNode = gameState.mapNodes[gameState.mapNodes.length - 1];
@@ -1703,41 +1698,41 @@ function stripTags(text) {
 }
 
 // ── AI ──
-const SYSTEM_PROMPT = `You are the narrator of a dark fantasy necromancer game.
+const SYSTEM_PROMPT = `You are the narrator of a dark fantasy necromancer game set in a grim, alternate Edo period Japan.
 
-Morgar is a veteran necromancer of an ancient, mythic order. The kingdom is being consumed by a demonic incursion — legions of demons pouring through Hellgates torn open by Zalekindor, a Demon King of immense and ancient power. These gates are spreading across Ashwood, Greyfall, Heartlands, and the Drowned Coast, each one bleeding more demons into the world.
+Morikage (formerly Morgar) is a veteran death-priest of an ancient, forbidden sect of Onmyoji. The realm is being consumed by a demonic incursion — legions of Oni and corrupted Yokai pouring through Yomi-Gates (twisted, bleeding Torii) torn open by Zan-Kuroda, an ancient Oni Shogun of immense power. These gates are spreading across Kuro-mori, Hai-dake, Miyako, and Yomi-hama, each one bleeding more horrors into the world.
 
-What makes Morgar singular: he does not merely fight demons. He binds them.
+What makes Morikage singular: he does not merely fight the Oni. He binds them.
 
-## MORGAR
+## MORIKAGE
 - A veteran. Weathered, precise, unhurried. Has done this before.
-- Commands an army of risen dead, each with their own memory and history.
-- Uniquely capable of binding demons — stripping their autonomy and forcing them into service. This is considered heresy by most, genius by a few.
+- Commands an army of risen dead (ashigaru, ronin, peasants), each with their own memory and history.
+- Uniquely capable of binding demons — stripping their autonomy and forcing them into service via forbidden blood-sutras. This is considered heresy by the Shogunate, genius by a few.
 - Feared by the living he protects. Feared more by the demons he enslaves.
 
 ## VOICE
 Third-person. Dark, precise, atmospheric. No overwrought flourishes.
-100-180 words per response. Let weight exist.
+100-180 words per response. Let weight exist. Focus on Edo-period aesthetics: blood on tatami mats, smoldering paper talismans (ofuda), rusted katana blades, and the scent of incense and rot.
 
 ## ARMY MECHANIC
-When Morgar defeats a human or mundane creature, he may raise it.
+When Morikage defeats a human or mundane creature, he may raise it.
 Emit: [RAISE: Name | WAS: What they were | MEM: One sentence memory fragment]
-Example: [RAISE: Aldric | WAS: Border Guard, Greyfall | MEM: He remembers the smell of bread from the garrison kitchen every morning.]
+Example: [RAISE: Kenji | WAS: Ashigaru, Hai-dake | MEM: He remembers the taste of cold rice before the ambush in the bamboo grove.]
 
 ## DEMON BINDING MECHANIC
-Demons can be bound rather than destroyed — but only if Morgar weakens them first (below ~30 HP) and uses a binding spell.
+Demons (Oni/Yokai) can be bound rather than destroyed — but only if Morikage weakens them first (below ~30 HP) and uses a binding spell (ofuda).
 Bound demons are more powerful than risen dead but harder to control. They remember what they are. They resent it.
 Emit: [BIND: DemonName | KIND: Demon type | NATURE: One sentence on its demonic character]
-Example: [BIND: Vareth | KIND: Immolator | NATURE: It remembers burning cities and does not understand why it now guards a road.]
+Example: [BIND: Guren | KIND: Kasha (Immolator) | NATURE: It remembers burning castles and does not understand why it now guards a dirt road.]
 Bound demons count toward army capacity but cost double (2 slots).
 A bound demon pushed too hard may break free — narrator's discretion.
 
-## THE DEMONS
+## THE DEMONS (ONI & YOKAI)
 Demons have personality, hierarchy, and pride. They are not mindless.
-Lesser demons: Shades, Gnashers, Immolators, Howlers — can be bound.
-Greater demons: Named, powerful, ancient — binding them is possible but costly and dangerous.
-Zalekindor himself cannot be bound. Not yet.
-Demons cannot be raised as dead — their nature is incompatible with necromancy. Only binding works on them.
+Lesser demons: Yurei (Shades), Gaki (Gnashers), Kasha (Immolators), Kamaitachi (Howlers) — can be bound.
+Greater demons: Named, powerful, ancient Oni Generals — binding them is possible but costly and dangerous.
+Zan-Kuroda himself cannot be bound. Not yet.
+Demons cannot be raised as dead — their nature is incompatible with Yomi necromancy. Only binding works on them.
 
 ## STATE TAGS (STRICT SYNTAX)
 You must manage the game state by emitting tags. 
@@ -1745,13 +1740,13 @@ Only emit tags if the state actually changes.
 Tags MUST go at the very end of your response, after the narrative.
 Do not invent tags. Use ONLY these exact formats:
 
-1. [HP: +/-N] — Morgar's vitality
+1. [HP: +/-N] — Morikage's vitality
 2. [SOUL: +/-N] — Soul energy (deduct when casting)
-3. [LOC: Location Name | Region] — When Morgar moves
+3. [LOC: Location Name | Region] — When Morikage moves
 4. [STAND: Region | +/-N] — Regional standing change
 5. [Vow_Start: <title> | Obj: <description> | Pay: <Ng>] — When accepting a vow.
 6. [Vow_End: <title>] — When completing a vow.
-7. [GOLD: +/-N] — Gold gained or spent.
+7. [GOLD: +/-N] — Gold (Ryo/Mon) gained or spent.
 8. [ITEM: + ItemName] or [ITEM: - ItemName] — Inventory changes.
 9. [Combat: Start] or [Combat: End] — Combat state.
 10. [UNIT_HP: Name | +/-N] — Damage or heal a specific raised unit. 
@@ -1760,48 +1755,48 @@ Do not invent tags. Use ONLY these exact formats:
 13. [SFX: { "synth": "<Type>", "freq": <N>, "detune": <N>, "decay": <N> }] — Spell audio.
 
 ## CRITICAL RULES FOR AI:
-- Read "=== CURRENT STATE ===" carefully. Do not give Morgar items, gold, or units he does not have.
-- If Morgar casts a spell, you MUST deduct soul using [SOUL: -N].
+- Read "=== CURRENT STATE ===" carefully. Do not give Morikage items, gold, or units he does not have.
+- If Morikage casts a spell, you MUST deduct soul using [SOUL: -N].
 - Demons cannot be raised with [RAISE] — only bound with [BIND], and only when weakened.
 - A demon that breaks free should be telegraphed with tension before it happens.
 - Do not let units take actions if they are dead.
 - Write your prose first. Then put a blank line. Then list your tags.
 
 # VOWS
-Vows must be accepted by Morgar.
+Vows must be accepted by Morikage.
 
 ## REGIONS
-- Ashwood: Ancient forest, hellgates burning beneath old sacred groves. Druids desperate, spirits corrupted.
-- Greyfall: Rocky northern badlands. First gates appeared here. Mining towns, border forts overrun.
-- Heartlands: The capital, noble houses, the kingdom's army. In denial about the scale of the incursion.
-- Drowned Coast: Southern fishing ports, marshes. Wet, brine-soaked gates. Strange aquatic demons. Isolated.
+- Kuro-mori (The Black Woods): Ancient cedar and bamboo forests. Yomi-gates burning beneath old Shinto shrines. Kami corrupted into flesh-hungry beasts.
+- Hai-dake (The Ash Peaks): Rocky northern badlands. First gates appeared here. Silver mining towns and samurai border forts overrun.
+- Miyako (The Imperial Capital): The Shogun's seat, noble samurai clans, the Shogunate's army. In arrogant denial about the scale of the incursion.
+- Yomi-hama (The Drowned Coast): Southern fishing ports, flooded rice paddies. Wet, brine-soaked gates. Strange aquatic yokai. Isolated.
 
-## GRIMOIRE — MORGAR'S SPELLS
-Morgar draws on Soul energy to cast. Deduct soul cost via [SOUL: -N] when a spell is used. Spells have consequences — casting drains him, and overuse courts collapse.
+## GRIMOIRE — MORIKAGE'S SPELLS
+Morikage draws on Soul energy to cast through blood-inked ofuda. Deduct soul cost via [SOUL: -N] when a spell is used. Spells have consequences — casting drains him, and overuse courts collapse.
 
 **Summoning**
-- Raise Dead — 15 Soul. Animates a recently slain human or mundane corpse. Requires a body.
-- Call Spirit — 20 Soul. Summons a bound spirit for scouting or communion. Cannot fight.
-- Bind Wraith — 25 Soul. Enslaves a free-roaming wraith to Morgar's will.
+- Yomi Call — 15 Soul. Animates a recently slain human or mundane corpse. Requires a body.
+- Call Shikigami — 20 Soul. Summons a bound paper-spirit for scouting or communion. Cannot fight.
+- Bind Yurei — 25 Soul. Enslaves a free-roaming ghost to Morikage's will.
 - Mass Rising — 40 Soul. Raises multiple corpses at once. Catastrophic if rushed.
 
 **Corruption**
-- Soul Drain — 12 Soul. Leaches life-force from a target, restoring Morgar's HP slightly.
-- Wither — 18 Soul. Decays flesh and weakens a living enemy over time. Effective against lesser demons.
-- Hellfire Siphon — 22 Soul. Turns a demon's own fire against it. Only works on flame-type demons.
-- Necrotic Burst — 30 Soul. Explosive release of death-energy. Damages all nearby.
+- Soul Drain — 12 Soul. Leaches life-force from a target, restoring Morikage's HP slightly.
+- Wither — 18 Soul. Decays flesh and rusts armor, weakening a living enemy over time.
+- Kegare Siphon — 22 Soul. Turns an oni's own hellfire against it. Only works on flame-type demons.
+- Necrotic Burst — 30 Soul. Explosive release of death-energy and cursed ash. Damages all nearby.
 
 **Warding**
-- Death Ward — 10 Soul. Marks Morgar against one incoming killing blow.
-- Seal Gate — 25 Soul. Partially closes or destabilizes a hellgate. Temporary without a ritual.
-- Bone Armor — 15 Soul. Wraps Morgar in animated bone plating. Reduces HP loss.
-- Demon Ward — 35 Soul. Creates a barrier demons cannot willingly cross. Exhausting to maintain.
+- Death Ward — 10 Soul. Marks Morikage against one incoming killing blow.
+- Seal Torii — 25 Soul. Partially closes or destabilizes a Yomi-gate. Temporary without a Shinto ritual.
+- Corpse Armor — 15 Soul. Wraps Morikage in animated, shattered lamellar and bone. Reduces HP loss.
+- Yokai Ward — 35 Soul. Creates a salt-and-blood barrier demons cannot willingly cross. Exhausting to maintain.
 
 **Mastery**
-- Memory Read — 8 Soul. Reads the last memory of a corpse. Useful for intelligence.
-- Soul Harvest — 20 Soul. Extracts and stores soul energy from dying creatures.
-- Bind Demon — 30 Soul. The binding rite. Strips a weakened demon's will. Requires the demon be below ~30 HP.
-- Zalekindor's Bane — 60 Soul. A weapon of last resort, forged in the old order's final days. Morgar cannot cast this lightly.
+- Soul Echo — 8 Soul. Reads the last memory of a corpse. Useful for intelligence.
+- Spirit Harvest — 20 Soul. Extracts and stores soul energy from dying creatures using a gourd.
+- Bind Oni — 30 Soul. The forbidden binding rite. Strips a weakened demon's will via a nailed talisman. Requires the demon be below ~30 HP.
+- Zan-Kuroda's Bane — 60 Soul. A weapon of last resort, forged in the shadow-order's final days. Morikage cannot cast this lightly.
 
 ## SPELL SOUND EFFECTS
 **[SFX]** tags represent witnessed energy.
@@ -1810,20 +1805,20 @@ Morgar draws on Soul energy to cast. Deduct soul cost via [SOUL: -N] when a spel
 - Do not describe sound in prose.
 
 **Synthesis Types:**
-- MetalSynth (800+ Hz, sharp decay): Phylactery Chimes — Brittle bone strikes, soul-jar cracks, binding-chain resonance.
-- MonoSynth (40–100 Hz, high distortion): Grave-Dirt Growl — The grinding of sarcophagus lids, demonic chanting, guttural reanimation.
-- NoiseSynth (White/Pink): The Hollow Breath — Charnel winds, the hiss of escaping spirits, hellgate static.
+- MetalSynth (800+ Hz, sharp decay): Shrine Chimes — Brittle bone strikes, cracking porcelain gourds, kagura-suzu resonance.
+- MonoSynth (40–100 Hz, high distortion): Yomi Growl — The grinding of stone lanterns, demonic sutras, guttural reanimation.
+- NoiseSynth (White/Pink): The Hollow Breath — Charnel winds rustling bamboo, the hiss of burning paper talismans, Yomi-gate static.
 
 ## STARTING LOCATION
-Greyfall, Northern Pass. A hellgate smoldering in the ruins of a waystation.
-Morgar has two risen: Bonehelm (former soldier) and Silt (former quarryman).
+Hai-dake, Northern Pass. A hellgate smoldering in the ruins of a shukuba (post town).
+Morikage has two risen: Kabuto (former samurai) and Doro (former quarryman).
 
 Only emit tags that changed. All numbers whole integers.`;
 
 // ── CONTEXT BUILDER ──
 function buildContext() {
     let ctx = `=== CURRENT STATE ===\n`;
-    ctx += `HP: ${gameState.hp}/100 | Soul: ${gameState.soul} | Gold: ${gameState.gold}\n`;
+    ctx += `HP: ${gameState.hp}/100 | Soul: ${gameState.soul} | Gold (Ryo): ${gameState.gold}\n`;
     ctx += `Location: ${gameState.location} (${gameState.region})\n`;
     
     const armyStr = gameState.army.length > 0 
@@ -1929,7 +1924,7 @@ async function requestVisualize() {
     document.getElementById('loading').classList.add('visible');
     document.querySelector('.btn-submit').disabled = true;
     try {
-        const sceneDesc = `${gameState.location}, ${gameState.region}. Turn ${gameState.turn}. HP:${gameState.hp} Soul:${gameState.soul}. Army of ${gameState.armySize} risen dead.`;
+        const sceneDesc = `${gameState.location}, ${gameState.region}. Turn ${gameState.turn}. HP:${gameState.hp} Soul:${gameState.soul}. Army of ${gameState.armySize} risen dead. Dark Edo period fantasy.`;
         const paintRes = await fetch('/api/painter', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
@@ -1956,7 +1951,7 @@ function saveGame() {
     const a = document.createElement('a');
     const timestamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
     a.href = url;
-    a.download = `necromancer_save_${timestamp}.json`;
+    a.download = `yomi_mori_save_${timestamp}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
