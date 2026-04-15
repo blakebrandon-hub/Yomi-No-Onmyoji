@@ -1420,9 +1420,6 @@ function displayMessage(narrative, playerAction, signal, imageB64) {
         const parsed = narrative.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
         html += `<div class="message-narrative">${parsed}</div>`;
     }
-    if (signal) {
-        html += `<div class="message-signal">${signal}</div>`;
-    }
 
     block.innerHTML = html;
     body.appendChild(block);
@@ -1640,9 +1637,6 @@ function parseTags(text) {
         }
     });
 
-    // Return Signal for UI display
-    const signalMatch = text.match(/\[SIGNAL:\s*([^\]]+)\]/i);
-    return signalMatch ? signalMatch[1].trim() : null;
 }
 
 function addMapNode(label, region) {
@@ -1689,7 +1683,6 @@ function stripTags(text) {
 
         // 5. Combat & Atmosphere
         .replace(/\[Combat:\s*[^\]]+\]/gi, '')
-        .replace(/\[SIGNAL:\s*[^\]]+\]/gi, '')
 
         // 6. Visuals & Army
         .replace(/\[RAISE:\s*[^\]]+\]/gi, '')
@@ -1729,18 +1722,30 @@ Example: [RAISE: Aldric | WAS: Border Guard, Greyfall | MEM: He remembers the sm
 Void creatures have no memory. They cannot be raised.
 They serve Zalekindor. They erase rather than kill.
 
-## STATE TAGS (emit at end, only if changed)
+## STATE TAGS (STRICT SYNTAX)
+You must manage the game state by emitting tags. 
+Only emit tags if the state actually changes. 
+Tags MUST go at the very end of your response, after the narrative.
+Do not invent tags. Use ONLY these exact formats:
+
 1. [HP: +/-N] — Morgar's vitality
-2. [SOUL: +/-N] — Soul energy (casting resource)
+2. [SOUL: +/-N] — Soul energy (deduct when casting)
 3. [LOC: Location Name | Region] — When Morgar moves
 4. [STAND: Region | +/-N] — Regional standing change
-5. [Vow_Start: <title> | Obj: <description> | Pay: <Ng>] — When Morgar ACCEPTS a vow. Use a short memorable title you will reuse exactly.
-   [Vow_End: <title>] — When Morgar COMPLETES a vow. Echo the EXACT title from Vow_Start. Emit this immediately upon completion.
-6. [GOLD: +/-N] — Gold gained (pay, loot, trade) or spent. When a Vow_End fires, also emit the gold award separately.
-7. [ITEM: + ItemName] or [ITEM: - ItemName] — Add or remove a notable item from inventory.
-8. [Combat: Start/End] — When combat begins or ends
-9. [SFX: { "synth": "<Type>", "freq": <N>, "detune": <N>, "decay": <N> }]  — when a spell is cast (JSON must be valid)
-10. [UNIT_HP: Name | +/-N] — Damage or heal a specific raised unit. If they drop to 0 HP, they are permanently destroyed.
+5. [Vow_Start: <title> | Obj: <description> | Pay: <Ng>] — When accepting a vow.
+6. [Vow_End: <title>] — When completing a vow.
+7. [GOLD: +/-N] — Gold gained or spent.
+8. [ITEM: + ItemName] or [ITEM: - ItemName] — Inventory changes.
+9. [Combat: Start] or [Combat: End] — Combat state.
+10. [UNIT_HP: Name | +/-N] — Damage or heal a specific raised unit. 
+11. [RAISE: Name | WAS: What they were | MEM: Short memory] — Raising a dead human/creature.
+12. [SFX: { "synth": "<Type>", "freq": <N>, "detune": <N>, "decay": <N> }] — Spell audio.
+
+## CRITICAL RULES FOR AI:
+- Read "=== CURRENT STATE ===" carefully. Do not give Morgar items, gold, or units he does not have.
+- If Morgar casts a spell, you MUST deduct soul using [SOUL: -N].
+- Do not let units take actions if they are dead.
+- Write your prose first. Then put a blank line. Then list your tags.
 
 ## REGIONS
 - Ashwood: Ancient forest, void consuming from within. Druids, spirits, sacred places.
