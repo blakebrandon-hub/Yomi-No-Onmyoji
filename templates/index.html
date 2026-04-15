@@ -821,6 +821,18 @@ header {
     <div class="header-title">Necromancer</div>
     <div class="header-meta">LOCATION: <span id="current-location-header">GREYFALL</span></div>
     <div style="display:flex; align-items:center; gap:12px;">
+        <button id="music-toggle" onclick="musicEngine.toggle()" style="
+            font-family: var(--font-ui);
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            background: transparent;
+            border: 1px solid var(--accent-bone-dim);
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+        ">♪ MUSIC</button>
         <button id="tts-toggle" onclick="tts.toggle()" style="
             font-family: var(--font-ui);
             font-size: 0.55rem;
@@ -882,7 +894,7 @@ header {
             <div class="panel-section-label">Risen Dead — <span id="army-count-label">0</span> units</div>
             <div class="bestiary-list" id="army-list">
                 <div style="padding:16px 12px; font-family:var(--font-prose); font-size:0.8rem; color:var(--text-dim); font-style:italic;">
-                    No dead have been raised. The void consumes them instead.
+                    No dead have been raised. The demons hold the field.
                 </div>
             </div>
             <div class="panel-bottom-btns">
@@ -1462,7 +1474,7 @@ function updateUI() {
 function renderArmyList() {
     const list = document.getElementById('army-list');
     if (gameState.army.length === 0) {
-        list.innerHTML = `<div style="padding:16px 12px; font-family:var(--font-prose); font-size:0.8rem; color:var(--text-dim); font-style:italic;">No dead have been raised. The void consumes them instead.</div>`;
+        list.innerHTML = `<div style="padding:16px 12px; font-family:var(--font-prose); font-size:0.8rem; color:var(--text-dim); font-style:italic;">No dead have been raised. The demons hold the field.</div>`;
         return;
     }
     list.innerHTML = gameState.army.map(unit => `
@@ -1612,7 +1624,22 @@ function parseTags(text) {
         gameState.armySize = gameState.army.length;
     }
 
-     // 10. UNIT HP: [UNIT_HP: Name | +/-N]
+    // 10. BIND: [BIND: DemonName | KIND: type | NATURE: text]
+    const bindMatch = text.match(/\[BIND:\s*([^|]+)\|\s*KIND:\s*([^|]+)\|\s*NATURE:\s*([^\]]+)\]/i);
+    if (bindMatch) {
+        gameState.army.push({
+            name: bindMatch[1].trim(),
+            was: `Bound Demon — ${bindMatch[2].trim()}`,
+            region: gameState.region,
+            memory: bindMatch[3].trim(),
+            hp: 100,
+            type: 'Bound',
+            slots: 2
+        });
+        gameState.armySize = gameState.army.length;
+    }
+
+     // 11. UNIT HP: [UNIT_HP: Name | +/-N]
     const unitHpMatches = [...text.matchAll(/\[UNIT_HP:\s*([^|]+)\|\s*([+-]?\d+)\]/gi)];
     unitHpMatches.forEach(m => {
         const unitName = m[1].trim().toLowerCase();
@@ -1686,6 +1713,7 @@ function stripTags(text) {
 
         // 6. Visuals & Army
         .replace(/\[RAISE:\s*[^\]]+\]/gi, '')
+        .replace(/\[BIND:\s*[^\]]+\]/gi, '')
 
         // 6b. Individual Unit HP
         .replace(/\[UNIT_HP:\s*[^\]]+\]/gi, '')
@@ -1700,27 +1728,39 @@ function stripTags(text) {
 // ── AI ──
 const SYSTEM_PROMPT = `You are the narrator of a dark fantasy necromancer game.
 
-Morgar is a veteran necromancer of an ancient, mythic order. He fights void creatures — servants of Zalekindor, a Demon King who has torn holes (Tears) between realities. 
-These tears are opening across the dying kingdom of Ashwood, Greyfall, Heartlands, and Drowned Coast.
+Morgar is a veteran necromancer of an ancient, mythic order. The kingdom is being consumed by a demonic incursion — legions of demons pouring through Hellgates torn open by Zalekindor, a Demon King of immense and ancient power. These gates are spreading across Ashwood, Greyfall, Heartlands, and the Drowned Coast, each one bleeding more demons into the world.
+
+What makes Morgar singular: he does not merely fight demons. He binds them.
 
 ## MORGAR
 - A veteran. Weathered, precise, unhurried. Has done this before.
 - Commands an army of risen dead, each with their own memory and history.
-- The void cannot be raised — void creatures have no self, no memory, nothing to anchor them.
-- Feared by the living he protects. Accepted by necessity.
+- Uniquely capable of binding demons — stripping their autonomy and forcing them into service. This is considered heresy by most, genius by a few.
+- Feared by the living he protects. Feared more by the demons he enslaves.
 
 ## VOICE
 Third-person. Dark, precise, atmospheric. No overwrought flourishes.
 100-180 words per response. Let weight exist.
 
 ## ARMY MECHANIC
-When Morgar defeats an enemy (not a void creature), he may raise it.
+When Morgar defeats a human or mundane creature, he may raise it.
 Emit: [RAISE: Name | WAS: What they were | MEM: One sentence memory fragment]
 Example: [RAISE: Aldric | WAS: Border Guard, Greyfall | MEM: He remembers the smell of bread from the garrison kitchen every morning.]
 
-## THE VOID
-Void creatures have no memory. They cannot be raised.
-They serve Zalekindor. They erase rather than kill.
+## DEMON BINDING MECHANIC
+Demons can be bound rather than destroyed — but only if Morgar weakens them first (below ~30 HP) and uses a binding spell.
+Bound demons are more powerful than risen dead but harder to control. They remember what they are. They resent it.
+Emit: [BIND: DemonName | KIND: Demon type | NATURE: One sentence on its demonic character]
+Example: [BIND: Vareth | KIND: Immolator | NATURE: It remembers burning cities and does not understand why it now guards a road.]
+Bound demons count toward army capacity but cost double (2 slots).
+A bound demon pushed too hard may break free — narrator's discretion.
+
+## THE DEMONS
+Demons have personality, hierarchy, and pride. They are not mindless.
+Lesser demons: Shades, Gnashers, Immolators, Howlers — can be bound.
+Greater demons: Named, powerful, ancient — binding them is possible but costly and dangerous.
+Zalekindor himself cannot be bound. Not yet.
+Demons cannot be raised as dead — their nature is incompatible with necromancy. Only binding works on them.
 
 ## STATE TAGS (STRICT SYNTAX)
 You must manage the game state by emitting tags. 
@@ -1739,46 +1779,52 @@ Do not invent tags. Use ONLY these exact formats:
 9. [Combat: Start] or [Combat: End] — Combat state.
 10. [UNIT_HP: Name | +/-N] — Damage or heal a specific raised unit. 
 11. [RAISE: Name | WAS: What they were | MEM: Short memory] — Raising a dead human/creature.
-12. [SFX: { "synth": "<Type>", "freq": <N>, "detune": <N>, "decay": <N> }] — Spell audio.
+12. [BIND: DemonName | KIND: Demon type | NATURE: Short demonic character] — Binding a weakened demon.
+13. [SFX: { "synth": "<Type>", "freq": <N>, "detune": <N>, "decay": <N> }] — Spell audio.
 
 ## CRITICAL RULES FOR AI:
 - Read "=== CURRENT STATE ===" carefully. Do not give Morgar items, gold, or units he does not have.
 - If Morgar casts a spell, you MUST deduct soul using [SOUL: -N].
+- Demons cannot be raised with [RAISE] — only bound with [BIND], and only when weakened.
+- A demon that breaks free should be telegraphed with tension before it happens.
 - Do not let units take actions if they are dead.
 - Write your prose first. Then put a blank line. Then list your tags.
 
+# VOWS
+Vows must be accepted by Morgar.
+
 ## REGIONS
-- Ashwood: Ancient forest, void consuming from within. Druids, spirits, sacred places.
-- Greyfall: Rocky northern badlands. First tears appeared here. Mining towns, border forts.
-- Heartlands: The capital, noble houses, the kingdom's army. In denial about the void.
-- Drowned Coast: Southern fishing ports, marshes. Strange wet tears. Isolated.
+- Ashwood: Ancient forest, hellgates burning beneath old sacred groves. Druids desperate, spirits corrupted.
+- Greyfall: Rocky northern badlands. First gates appeared here. Mining towns, border forts overrun.
+- Heartlands: The capital, noble houses, the kingdom's army. In denial about the scale of the incursion.
+- Drowned Coast: Southern fishing ports, marshes. Wet, brine-soaked gates. Strange aquatic demons. Isolated.
 
 ## GRIMOIRE — MORGAR'S SPELLS
 Morgar draws on Soul energy to cast. Deduct soul cost via [SOUL: -N] when a spell is used. Spells have consequences — casting drains him, and overuse courts collapse.
 
 **Summoning**
-- Raise Dead — 15 Soul. Animates a recently slain non-void corpse. Requires a body.
+- Raise Dead — 15 Soul. Animates a recently slain human or mundane corpse. Requires a body.
 - Call Spirit — 20 Soul. Summons a bound spirit for scouting or communion. Cannot fight.
 - Bind Wraith — 25 Soul. Enslaves a free-roaming wraith to Morgar's will.
 - Mass Rising — 40 Soul. Raises multiple corpses at once. Catastrophic if rushed.
 
 **Corruption**
 - Soul Drain — 12 Soul. Leaches life-force from a target, restoring Morgar's HP slightly.
-- Wither — 18 Soul. Decays flesh and weakens a living enemy over time.
-- Void Touch — 22 Soul. Corrupts a target with void-taint. Dangerous near tears.
+- Wither — 18 Soul. Decays flesh and weakens a living enemy over time. Effective against lesser demons.
+- Hellfire Siphon — 22 Soul. Turns a demon's own fire against it. Only works on flame-type demons.
 - Necrotic Burst — 30 Soul. Explosive release of death-energy. Damages all nearby.
 
 **Warding**
 - Death Ward — 10 Soul. Marks Morgar against one incoming killing blow.
-- Seal Breach — 25 Soul. Partially closes or stabilizes a void tear. Temporary.
+- Seal Gate — 25 Soul. Partially closes or destabilizes a hellgate. Temporary without a ritual.
 - Bone Armor — 15 Soul. Wraps Morgar in animated bone plating. Reduces HP loss.
-- Null Field — 35 Soul. Suppresses void activity in a small area. Exhausting to maintain.
+- Demon Ward — 35 Soul. Creates a barrier demons cannot willingly cross. Exhausting to maintain.
 
 **Mastery**
 - Memory Read — 8 Soul. Reads the last memory of a corpse. Useful for intelligence.
 - Soul Harvest — 20 Soul. Extracts and stores soul energy from dying creatures.
-- Ancient Rite — 30 Soul. Invokes the old order's power. Effects vary by location.
-- Zalekindor's Bane — 60 Soul. A weapon of last resort. Morgar cannot cast this lightly.
+- Bind Demon — 30 Soul. The binding rite. Strips a weakened demon's will. Requires the demon be below ~30 HP.
+- Zalekindor's Bane — 60 Soul. A weapon of last resort, forged in the old order's final days. Morgar cannot cast this lightly.
 
 ## SPELL SOUND EFFECTS
 **[SFX]** tags represent witnessed energy.
@@ -1787,12 +1833,12 @@ Morgar draws on Soul energy to cast. Deduct soul cost via [SOUL: -N] when a spel
 - Do not describe sound in prose.
 
 **Synthesis Types:**
-- MetalSynth (800+ Hz, sharp decay): Phylactery Chimes — Brittle bone strikes, soul-jar cracks, ritual blade resonance.
-- MonoSynth (40–100 Hz, high distortion): Grave-Dirt Growl — The grinding of sarcophagus lids, subterranean tremors, guttural reanimation chants.
-- NoiseSynth (White/Pink): The Hollow Breath — Charnel house winds, the hiss of escaping spirits, shifting funeral ash.
+- MetalSynth (800+ Hz, sharp decay): Phylactery Chimes — Brittle bone strikes, soul-jar cracks, binding-chain resonance.
+- MonoSynth (40–100 Hz, high distortion): Grave-Dirt Growl — The grinding of sarcophagus lids, demonic chanting, guttural reanimation.
+- NoiseSynth (White/Pink): The Hollow Breath — Charnel winds, the hiss of escaping spirits, hellgate static.
 
 ## STARTING LOCATION
-Greyfall, Northern Pass. Minor tear. Village headman watching from his doorway.
+Greyfall, Northern Pass. A hellgate smoldering in the ruins of a waystation.
 Morgar has two risen: Bonehelm (former soldier) and Silt (former quarryman).
 
 Only emit tags that changed. All numbers whole integers.`;
@@ -1806,7 +1852,7 @@ function buildContext() {
     // Army
     const armyStr = gameState.army.length > 0 
         ? gameState.army.map(u => `${u.name} (HP: ${u.hp}/100) [${u.was}]`).join(', ') 
-        : 'None (Void creatures consumed them)';
+        : 'None';
     ctx += `Army (${gameState.armySize}/${gameState.armyMax}): ${armyStr}\n`;
     
     // Inventory
@@ -1988,6 +2034,108 @@ function loadGame() {
     input.click();
     document.body.removeChild(input);
 }
+
+
+// MUSIC SYSTEM
+const AMBIENT_TRACKS = [
+    '/ambient1.mp3',
+    '/ambient2.mp3',
+    '/ambient3.mp3',
+    '/ambient4.mp3',
+];
+
+const BATTLE_TRACKS = [
+    '/battle1.mp3',
+    '/battle2.mp3',
+    '/battle3.mp3',
+    '/battle4.mp3',
+];
+
+const musicEngine = (() => {
+    let enabled = false;
+    let inCombat = false;
+    let ambientIdx = Math.floor(Math.random() * 4);
+    let battleIdx  = Math.floor(Math.random() * 4);
+
+    const ambientAudio = new Audio();
+    ambientAudio.loop = true;
+    ambientAudio.volume = 0;
+
+    const battleAudio = new Audio();
+    battleAudio.loop = true;
+    battleAudio.volume = 0;
+
+    function fadeTo(audio, targetVol, duration = 3000) {
+        const steps = 30;
+        const interval = duration / steps;
+        const delta = (targetVol - audio.volume) / steps;
+        const timer = setInterval(() => {
+            audio.volume = Math.max(0, Math.min(1, audio.volume + delta));
+            if ((delta > 0 && audio.volume >= targetVol) ||
+                (delta < 0 && audio.volume <= targetVol)) {
+                audio.volume = targetVol;
+                clearInterval(timer);
+                if (targetVol === 0) audio.pause();
+            }
+        }, interval);
+    }
+
+    function playAmbient() {
+        ambientAudio.src = AMBIENT_TRACKS[ambientIdx % AMBIENT_TRACKS.length];
+        ambientAudio.volume = 0;
+        ambientAudio.play().then(() => fadeTo(ambientAudio, 0.5)).catch(e => console.warn('Ambient play failed:', e));
+    }
+
+    function playBattle() {
+        battleAudio.src = BATTLE_TRACKS[battleIdx % BATTLE_TRACKS.length];
+        battleAudio.volume = 0;
+        battleAudio.play().then(() => fadeTo(battleAudio, 0.8)).catch(e => console.warn('Battle play failed:', e));
+    }
+
+    function updateBtn() {
+        const btn = document.getElementById('music-toggle');
+        if (!btn) return;
+        if (enabled) {
+            btn.textContent = inCombat ? '⚔ MUSIC' : '♪ MUSIC';
+            btn.style.borderColor = 'var(--accent-bone)';
+            btn.style.color = 'var(--accent-bone)';
+        } else {
+            btn.textContent = '♪ MUSIC';
+            btn.style.borderColor = 'var(--accent-bone-dim)';
+            btn.style.color = 'var(--text-dim)';
+        }
+    }
+
+    return {
+        toggle() {
+            enabled = !enabled;
+            if (enabled) {
+                if (inCombat) playBattle(); else playAmbient();
+            } else {
+                fadeTo(ambientAudio, 0);
+                fadeTo(battleAudio, 0);
+            }
+            updateBtn();
+        },
+        onCombatTag(state) {
+            inCombat = (state === 'start');
+            if (!enabled) return;
+            if (inCombat) {
+                fadeTo(ambientAudio, 0);
+                setTimeout(() => playBattle(), 1000);
+            } else {
+                fadeTo(battleAudio, 0);
+                battleIdx = (battleIdx + 1) % 4;
+                setTimeout(() => {
+                    ambientIdx = (ambientIdx + 1) % 4;
+                    playAmbient();
+                }, 1500);
+            }
+            updateBtn();
+        }
+    };
+})();
+
 </script>
 </body>
 </html>
