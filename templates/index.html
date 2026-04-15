@@ -33,6 +33,8 @@
     --accent-bone-dim: #6b5f3a;
     --accent-tear: #6600aa;
     --accent-tear-bright: #aa44ff;
+    --accent-gold: #c8a830;
+    --accent-gold-dim: #6b5510;
 
     --font-title: 'Cinzel', serif;
     --font-prose: 'Crimson Text', serif;
@@ -628,6 +630,47 @@ header {
 
 .vital-box-value.hp { color: var(--accent-danger-bright); }
 .vital-box-value.soul { color: var(--accent-soul); }
+.vital-box-value.gold { color: var(--accent-gold); }
+
+/* INVENTORY */
+.inventory-section {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.inventory-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.inventory-item {
+    background: var(--bg-entry);
+    border: 1px solid var(--border);
+    padding: 5px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-ui);
+    font-size: 0.58rem;
+    letter-spacing: 1px;
+    color: var(--text-bone);
+    transition: border-color 0.2s;
+}
+
+.inventory-item:hover { border-color: var(--accent-bone-dim); }
+
+.inventory-item-name { color: var(--accent-bone); }
+.inventory-item-qty { color: var(--text-dim); }
+
+.inventory-empty {
+    font-family: var(--font-prose);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-style: italic;
+    padding: 4px 0;
+}
 
 /* ARMY */
 .army-section {
@@ -901,6 +944,12 @@ header {
                         <div class="vital-box-value soul"><span id="soul-val">80</span></div>
                     </div>
                 </div>
+                <div class="vitals-grid" style="margin-top:6px;">
+                    <div class="vital-box" style="grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between; padding:6px 10px;">
+                        <div class="vital-box-label" style="margin-bottom:0;">Gold</div>
+                        <div class="vital-box-value gold" style="font-size:0.9rem;">⬡ <span id="gold-val">100</span></div>
+                    </div>
+                </div>
             </div>
 
             <!-- ARMY -->
@@ -939,6 +988,14 @@ header {
                 <div class="section-label">Oaths Sworn</div>
                 <div id="oaths-list">
                     <div class="oath-empty">No oath has been sworn. The dead are unburdened.</div>
+                </div>
+            </div>
+
+            <!-- INVENTORY -->
+            <div class="inventory-section">
+                <div class="section-label">Carried</div>
+                <div class="inventory-grid" id="inventory-list">
+                    <div class="inventory-empty">Nothing carried. The dead need no supplies.</div>
                 </div>
             </div>
 
@@ -1140,14 +1197,20 @@ const spellSFX = {
 const gameState = {
     hp: 100,
     soul: 80,
-    armySize: 0,
+    armySize: 2,
     armyMax: 20,
+    gold: 100,
     location: 'Northern Pass',
     region: 'Greyfall',
     turn: 0,
     standing: { ashwood: 0, greyfall: 0, heartlands: 0, coast: 0 },
-    army: [],
+    army: [
+        { name: 'Bonehelm', was: 'Border Soldier, Greyfall', mem: 'He remembers the weight of his shield on long marches north.' },
+        { name: 'Silt', was: 'Quarryman, Greyfall', mem: 'He remembers the sound the stone made when it finally gave way.' }
+    ],
+    inventory: [],
     oaths: [],
+    active_oath: null,
     mapNodes: [
         { id: 'start', label: 'Northern Pass', region: 'greyfall', x: 0.45, y: 0.35, status: 'current', connections: [] }
     ],
@@ -1192,6 +1255,12 @@ function init() {
     updateUI();
     const opening = `The wind comes down from the Greyfall highlands carrying the smell of cold stone and something older — a wrongness in the air that Morgar has learned to read like weather.\n\nThe tear opened three days ago at the Northern Pass. Small, as tears go. A ragged seam in the fabric of the world, barely wide enough for the things that have been spilling through. Two border soldiers are already dead. A shepherd's dog. Something else that left marks in the rock no natural creature makes.\n\nMorgar stands at the edge of the settlement's torchlight, looking north. Bonehelm and Silt, two of his older risen — a soldier and a quarryman — wait behind him in the dark, patient as only the dead can be. Somewhere above, the tear pulses with a light that has no color.\n\nThe village headman is watching from his doorway, lantern in hand, certain that the thing he hired is only marginally better than the things he hired it to stop.`;
     displayMessage(opening, null);
+
+    // Starting quest
+    const startingOath = { title: 'Seal the Northern Pass Tear', desc: 'The headman has hired Morgar to close the tear and stop whatever is coming through. The village will not survive another three days.', pay: '40g', status: 'active' };
+    gameState.oaths.push(startingOath);
+    gameState.active_oath = startingOath;
+    updateUI();
 }
 
 window.addEventListener('DOMContentLoaded', init);
@@ -1335,7 +1404,7 @@ function drawMap() {
 }
 
 // ── DISPLAY ──
-function displayMessage(narrative, playerAction, signal) {
+function displayMessage(narrative, playerAction, signal, imageB64) {
     const body = document.getElementById('chronicle-body');
     const block = document.createElement('div');
     block.className = 'message-block';
@@ -1343,6 +1412,9 @@ function displayMessage(narrative, playerAction, signal) {
     let html = '';
     if (playerAction) {
         html += `<div class="message-player"><span>Morgar ›</span>${playerAction}</div>`;
+    }
+    if (imageB64) {
+        html += `<img class="scene-image" src="data:image/png;base64,${imageB64}" alt="Scene">`;
     }
     if (narrative) {
         const parsed = narrative.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
@@ -1356,7 +1428,6 @@ function displayMessage(narrative, playerAction, signal) {
     body.appendChild(block);
     body.scrollTop = body.scrollHeight;
 
-    // Narrate the narrative text (not the player action or signal)
     if (narrative) tts.speak(narrative);
 }
 
@@ -1364,6 +1435,7 @@ function displayMessage(narrative, playerAction, signal) {
 function updateUI() {
     document.getElementById('hp-val').textContent = gameState.hp;
     document.getElementById('soul-val').textContent = gameState.soul;
+    document.getElementById('gold-val').textContent = gameState.gold;
     document.getElementById('army-size').textContent = gameState.armySize;
     document.getElementById('army-count-label').textContent = gameState.armySize;
     document.getElementById('army-bar').style.width = `${(gameState.armySize / gameState.armyMax) * 100}%`;
@@ -1385,6 +1457,9 @@ function updateUI() {
 
     // Army list
     renderArmyList();
+
+    // Inventory
+    renderInventory();
 }
 
 function renderArmyList() {
@@ -1399,6 +1474,20 @@ function renderArmyList() {
             <div class="unit-was">Was: ${unit.was} · ${unit.region}</div>
             <div class="unit-memory">"${unit.memory}"</div>
             <div class="unit-hp">HP: ${unit.hp} · ${unit.type}</div>
+        </div>
+    `).join('');
+}
+
+function renderInventory() {
+    const list = document.getElementById('inventory-list');
+    if (!gameState.inventory || gameState.inventory.length === 0) {
+        list.innerHTML = `<div class="inventory-empty">Nothing carried. The dead need no supplies.</div>`;
+        return;
+    }
+    list.innerHTML = gameState.inventory.map(item => `
+        <div class="inventory-item">
+            <span class="inventory-item-name">${item.name}</span>
+            ${item.qty > 1 ? `<span class="inventory-item-qty">x${item.qty}</span>` : ''}
         </div>
     `).join('');
 }
@@ -1419,9 +1508,100 @@ function renderOaths() {
     `).join('');
 }
 
-// ── PARSE TAGS ──
+// PARSE TAGS
 function parseTags(text) {
-    // Army raise
+    // 1. HP: [HP: +/-N]
+    const hpMatch = text.match(/\[HP:\s*([+-]?\d+)\]/i);
+    if (hpMatch) gameState.hp = Math.max(0, Math.min(100, gameState.hp + parseInt(hpMatch[1])));
+
+    // 2. SOUL: [SOUL: +/-N]
+    const soulMatch = text.match(/\[SOUL:\s*([+-]?\d+)\]/i);
+    if (soulMatch) gameState.soul = Math.max(0, Math.min(100, gameState.soul + parseInt(soulMatch[1])));
+
+    // 3. LOC: [LOC: Location | Region]
+    const locMatch = text.match(/\[LOC:\s*([^|\]]+)(?:\s*\|\s*([^\]]+))?\]/i);
+    if (locMatch) {
+        gameState.location = locMatch[1].trim();
+        if (locMatch[2]) gameState.region = locMatch[2].trim();
+        addMapNode(gameState.location, gameState.region);
+    }
+
+    // 4. STAND: [STAND: Region | +/-N]
+    const standMatches = [...text.matchAll(/\[STAND:\s*([^|\]]+)\|\s*([+-]?\d+)\]/gi)];
+    standMatches.forEach(m => {
+        const regionInput = m[1].trim().toLowerCase();
+        const change = parseInt(m[2]);
+        // Maps input like "Ashwood" or "The Ashwood" to keys: ashwood, greyfall, heartlands, coast
+        Object.keys(gameState.standing).forEach(key => {
+            if (regionInput.includes(key)) gameState.standing[key] += change;
+        });
+    });
+
+    // 5. Vow Start: [Vow_Start: <name> | Obj: <description> | Pay: <g>]
+    const vowStart = text.match(/\[Vow_Start:\s*([^|\]]+)\|\s*Obj:\s*([^|\]]+)\|\s*Pay:\s*([^\]]+)\]/i);
+    if (vowStart) {
+        const newOath = { title: vowStart[1].trim(), desc: vowStart[2].trim(), pay: vowStart[3].trim(), status: 'active' };
+        gameState.oaths.push(newOath);
+        gameState.active_oath = newOath;
+    }
+
+
+    // 6. Vow End: [Vow_End: <n>] — fuzzy match so AI partial titles still resolve
+    const vowEnd = text.match(/\[Vow_End:\s*([^\]]+)\]/i);
+    if (vowEnd) {
+        const key = vowEnd[1].trim().toLowerCase();
+        let oath = gameState.oaths.find(o => o.status === 'active' && o.title.toLowerCase() === key);
+        if (!oath) oath = gameState.oaths.find(o => o.status === 'active' &&
+            (o.title.toLowerCase().includes(key) || key.includes(o.title.toLowerCase().split(' ').slice(0,3).join(' '))));
+        if (!oath) {
+            const active = gameState.oaths.filter(o => o.status === 'active');
+            if (active.length === 1) oath = active[0];
+        }
+        if (oath) {
+            oath.status = 'complete';
+            if (gameState.active_oath === oath) gameState.active_oath = null;
+            if (oath.pay) {
+                const g = parseInt(String(oath.pay).replace(/[^\d]/g, ''));
+                if (!isNaN(g) && g > 0) gameState.gold = Math.max(0, (gameState.gold || 0) + g);
+            }
+        }
+    }
+
+    // 6b. GOLD: [GOLD: +/-N]
+    const goldMatch = text.match(/\[GOLD:\s*([+-]?\d+)\]/i);
+    if (goldMatch) gameState.gold = Math.max(0, (gameState.gold || 0) + parseInt(goldMatch[1]));
+
+    // 6c. ITEM: [ITEM: + Name] or [ITEM: - Name]
+    const itemMatches = [...text.matchAll(/\[ITEM:\s*([+-])\s*([^\]]+)\]/gi)];
+    itemMatches.forEach(m => {
+        if (!gameState.inventory) gameState.inventory = [];
+        const op = m[1], itemName = m[2].trim();
+        if (op === '+') {
+            const ex = gameState.inventory.find(i => i.name.toLowerCase() === itemName.toLowerCase());
+            if (ex) ex.qty = (ex.qty || 1) + 1;
+            else gameState.inventory.push({ name: itemName, qty: 1 });
+        } else {
+            const idx = gameState.inventory.findIndex(i => i.name.toLowerCase() === itemName.toLowerCase());
+            if (idx !== -1) {
+                gameState.inventory[idx].qty = (gameState.inventory[idx].qty || 1) - 1;
+                if (gameState.inventory[idx].qty <= 0) gameState.inventory.splice(idx, 1);
+            }
+        }
+    });
+
+    // 7. Combat: [Combat: Start/End]
+    const combatMatch = text.match(/\[Combat:\s*(Start|End)\]/i);
+    if (combatMatch) {
+        gameState.inCombat = (combatMatch[1].toLowerCase() === 'start');
+    }
+
+    // 8. SFX: [SFX: {JSON}]
+    const sfxMatch = text.match(/\[SFX:\s*(\{[\s\S]*?\}|\[[\s\S]*?\])\s*\]/i);
+    if (sfxMatch) {
+        try { spellSFX.play(sfxMatch[1].trim()); } catch(e) { console.warn("SFX Parse Error", e); }
+    }
+
+    // 9. RAISE (Legacy Mechanic Support)
     const raiseMatch = text.match(/\[RAISE:\s*([^|]+)\|\s*WAS:\s*([^|]+)\|\s*MEM:\s*([^\]]+)\]/i);
     if (raiseMatch) {
         gameState.army.push({
@@ -1435,68 +1615,7 @@ function parseTags(text) {
         gameState.armySize = gameState.army.length;
     }
 
-    // HP change
-    const hpMatch = text.match(/\[HP:\s*([+-]?\d+)\]/i);
-    if (hpMatch) gameState.hp = Math.max(0, Math.min(100, gameState.hp + parseInt(hpMatch[1])));
-
-    // Soul change
-    const soulMatch = text.match(/\[SOUL:\s*([+-]?\d+)\]/i);
-    if (soulMatch) gameState.soul = Math.max(0, Math.min(100, gameState.soul + parseInt(soulMatch[1])));
-
-    // Location
-    const locMatch = text.match(/\[LOC:\s*([^|]+)(?:\|\s*([^\]]+))?\]/i);
-    if (locMatch) {
-        gameState.location = locMatch[1].trim();
-        if (locMatch[2]) gameState.region = locMatch[2].trim();
-        addMapNode(gameState.location, gameState.region);
-    }
-
-    // Standing
-    const standMatches = [...text.matchAll(/\[STAND:\s*([^|]+)\|\s*([+-]?\d+)\]/gi)];
-    standMatches.forEach(m => {
-        const region = m[1].trim().toLowerCase();
-        const change = parseInt(m[2]);
-        if (region.includes('ash')) gameState.standing.ashwood += change;
-        else if (region.includes('grey')) gameState.standing.greyfall += change;
-        else if (region.includes('heart')) gameState.standing.heartlands += change;
-        else if (region.includes('coast') || region.includes('drown')) gameState.standing.coast += change;
-    });
-
-    // Vow start: [Vow_Start: <n> | Obj: <task> | Pay: <g>]
-    const vowStartMatch = text.match(/\[Vow_Start:\s*([^|]+)\|\s*Obj:\s*([^|]+)\|\s*Pay:\s*([^\]]+)\]/i);
-    if (vowStartMatch) {
-        gameState.oaths.push({
-            title: vowStartMatch[1].trim(),
-            desc: vowStartMatch[2].trim(),
-            pay: vowStartMatch[3].trim(),
-            status: 'active'
-        });
-    }
-
-    // Vow end: [Vow_End: <n> | Obj: <task> | Pay: <g>]
-    const vowEndMatch = text.match(/\[Vow_End:\s*([^|]+)\|\s*Obj:\s*([^|]+)\|\s*Pay:\s*([^\]]+)\]/i);
-    if (vowEndMatch) {
-        const title = vowEndMatch[1].trim().toLowerCase();
-        const vow = gameState.oaths.find(o => o.title.toLowerCase() === title);
-        if (vow) {
-            vow.status = 'complete';
-            vow.pay = vowEndMatch[3].trim();
-        }
-    }
-
-    // Combat: [Combat: Start] or [Combat: End]
-    const combatMatch = text.match(/\[Combat:\s*(Start|End)\]/i);
-    if (combatMatch) {
-        gameState.inCombat = combatMatch[1].toLowerCase() === 'start';
-        // Hook for future music trigger
-        document.dispatchEvent(new CustomEvent('necro:combat', { detail: { active: gameState.inCombat } }));
-    }
-
-    // SFX — content is a JSON object/array, so match from first { or [ to last } or ]
-    const sfxMatch = text.match(/\[SFX:\s*(\{[\s\S]*\}|\[[\s\S]*\])\s*\]/i);
-    if (sfxMatch) spellSFX.play(sfxMatch[1].trim());
-
-    // Signal
+    // Return Signal for UI display
     const signalMatch = text.match(/\[SIGNAL:\s*([^\]]+)\]/i);
     return signalMatch ? signalMatch[1].trim() : null;
 }
@@ -1524,18 +1643,36 @@ function addMapNode(label, region) {
 }
 
 function stripTags(text) {
+    if (!text) return "";
+
     return text
-        .replace(/\[RAISE:[^\]]+\]/gi, '')
-        .replace(/\[HP:[^\]]+\]/gi, '')
-        .replace(/\[SOUL:[^\]]+\]/gi, '')
-        .replace(/\[LOC:[^\]]+\]/gi, '')
-        .replace(/\[STAND:[^\]]+\]/gi, '')
-        .replace(/\[Vow_Start:[^\]]+\]/gi, '')
-        .replace(/\[Vow_End:[^\]]+\]/gi, '')
-        .replace(/\[Combat:[^\]]+\]/gi, '')
+        // 1. Core Stats
+        .replace(/\[HP:\s*[+-]?\d+\]/gi, '')
+        .replace(/\[SOUL:\s*[+-]?\d+\]/gi, '')
+
+        // 2. World & Standing
+        .replace(/\[LOC:\s*[^\]]+\]/gi, '')
+        .replace(/\[STAND:\s*[^\]]+\]/gi, '')
+
+        // 3. Vows / Oaths
+        .replace(/\[Vow_Start:\s*[^\]]+\]/gi, '')
+        .replace(/\[Vow_End:\s*[^\]]+\]/gi, '')
+
+        // 4. Gold & Inventory
+        .replace(/\[GOLD:\s*[+-]?\d+\]/gi, '')
+        .replace(/\[ITEM:\s*[+-]\s*[^\]]+\]/gi, '')
+
+        // 5. Combat & Atmosphere
+        .replace(/\[Combat:\s*[^\]]+\]/gi, '')
+        .replace(/\[SIGNAL:\s*[^\]]+\]/gi, '')
+
+        // 6. Visuals & Army
+        .replace(/\[RAISE:\s*[^\]]+\]/gi, '')
+
+        // 7. SFX (Handles potential nested JSON brackets)
         .replace(/\[SFX:\s*[\s\S]*?(?:\}|\])\s*\]/gi, '')
-        .replace(/\[SIGNAL:[^\]]+\]/gi, '')
-        .replace(/\[GENERATE_IMAGE:[^\]]+\]/gi, '')
+
+        // Final cleanup of extra whitespace
         .trim();
 }
 
@@ -1565,15 +1702,17 @@ Void creatures have no memory. They cannot be raised.
 They serve Zalekindor. They erase rather than kill.
 
 ## STATE TAGS (emit at end, only if changed)
-[HP: +/-N] — Morgar's vitality
-[SOUL: +/-N] — Soul energy (casting resource)
-[LOC: Location Name | Region] — When Morgar moves
-[STAND: Region | +/-N] — Regional standing change
-[Vow_Start: <name> | Obj: <task description> | Pay: <reward>] — When Morgar accepts or swears a vow
-[Vow_End: <name> | Obj: <task description> | Pay: <reward>] — When a vow is fulfilled, broken, or lost
-[Combat: Start] — When combat begins
-[Combat: End] — When combat ends
-[SIGNAL: One atmospheric observation. The world noticing itself.]
+1. [HP: +/-N] — Morgar's vitality
+2. [SOUL: +/-N] — Soul energy (casting resource)
+3. [LOC: Location Name | Region] — When Morgar moves
+4. [STAND: Region | +/-N] — Regional standing change
+5. [Vow_Start: <title> | Obj: <description> | Pay: <Ng>] — When Morgar ACCEPTS a vow. Use a short memorable title you will reuse exactly.
+   [Vow_End: <title>] — When Morgar COMPLETES a vow. Echo the EXACT title from Vow_Start. Emit this immediately upon completion.
+6. [GOLD: +/-N] — Gold gained (pay, loot, trade) or spent. When a Vow_End fires, also emit the gold award separately.
+7. [ITEM: + ItemName] or [ITEM: - ItemName] — Add or remove a notable item from inventory.
+8. [Combat: Start/End] — When combat begins or ends
+9. [SIGNAL: One atmospheric observation. The world noticing itself.]
+10. [SFX: { "synth": "<Type>", "freq": <N>, "detune": <N>, "decay": <N> }]  — when a spell is cast (JSON must be valid)
 
 ## REGIONS
 - Ashwood: Ancient forest, void consuming from within. Druids, spirits, sacred places.
@@ -1609,9 +1748,15 @@ Morgar draws on Soul energy to cast. Deduct soul cost via [SOUL: -N] when a spel
 - Zalekindor's Bane — 60 Soul. A weapon of last resort. Morgar cannot cast this lightly.
 
 ## SPELL SOUND EFFECTS
-When Morgar casts a spell, emit a Tone.js sound design as compact JSON inside an [SFX] tag. Each sound is an array of layers. Each layer has: synth (Tone.js synth params + notes, duration, sequence), noise (Tone.js NoiseSynth params + color, bursts), fx (reverb, distortion, chorus), delay, and totalDuration (seconds). Design the sound to match the spell's school and intensity.
-[SFX: [...layers] ]
-Only emit when a spell is actually cast. Keep JSON on one line.
+**[SFX]** tags represent witnessed energy.
+- Emit only when event produces distinct audible footprint.
+- Silence is default state.
+- Do not describe sound in prose.
+
+**Synthesis Types:**
+- MetalSynth (800+ Hz, sharp decay): Phylactery Chimes — Brittle bone strikes, soul-jar cracks, ritual blade resonance.
+- MonoSynth (40–100 Hz, high distortion): Grave-Dirt Growl — The grinding of sarcophagus lids, subterranean tremors, guttural reanimation chants.
+- NoiseSynth (White/Pink): The Hollow Breath — Charnel house winds, the hiss of escaping spirits, shifting funeral ash.
 
 ## STARTING LOCATION
 Greyfall, Northern Pass. Minor tear. Village headman watching from his doorway.
@@ -1651,7 +1796,25 @@ async function sendAction() {
 
         const signal = parseTags(responseText);
         const clean = stripTags(responseText);
-        displayMessage(clean, action, signal);
+
+        // Check for image generation tag and call painter API
+        const imgMatch = responseText.match(/\[GENERATE_IMAGE:\s*([^\]]+)\]/i);
+        let imageB64 = null;
+        if (imgMatch) {
+            try {
+                const paintRes = await fetch('/api/painter', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ prompt: imgMatch[1].trim(), aspect_ratio: '16:9' })
+                });
+                const paintData = await paintRes.json();
+                if (paintData.success) imageB64 = paintData.image_base64;
+            } catch (imgErr) {
+                console.warn('Image generation failed:', imgErr);
+            }
+        }
+
+        displayMessage(clean, action, signal, imageB64);
         updateUI();
 
     } catch (err) {
@@ -1667,10 +1830,28 @@ function handleKey(e) {
     if (e.key === 'Enter') sendAction();
 }
 
-function requestVisualize() {
-    const input = document.getElementById('action-input');
-    input.value = '[Visualize the current scene]';
-    sendAction();
+async function requestVisualize() {
+    document.getElementById('loading').classList.add('visible');
+    document.querySelector('.btn-submit').disabled = true;
+    try {
+        const sceneDesc = `${gameState.location}, ${gameState.region}. Turn ${gameState.turn}. HP:${gameState.hp} Soul:${gameState.soul}. Army of ${gameState.armySize} risen dead.`;
+        const paintRes = await fetch('/api/painter', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ prompt: sceneDesc, aspect_ratio: '16:9' })
+        });
+        const paintData = await paintRes.json();
+        if (paintData.success) {
+            displayMessage(null, '[Visualize the current scene]', null, paintData.image_base64);
+        } else {
+            displayMessage(`Visualization failed: ${paintData.error}`, '[Visualize the current scene]', null);
+        }
+    } catch (err) {
+        displayMessage(`Visualization failed: ${err.message}`, '[Visualize the current scene]', null);
+    }
+    document.getElementById('loading').classList.remove('visible');
+    document.querySelector('.btn-submit').disabled = false;
+    document.getElementById('chronicle-body').scrollTop = document.getElementById('chronicle-body').scrollHeight;
 }
 
 function saveGame() {
