@@ -1,6 +1,3 @@
-
-<img width="1366" height="768" alt="Screenshot 2026-04-15 155843" src="https://github.com/user-attachments/assets/6f9fa49b-d536-496f-bd5e-244682e5cc95" />
-
 > *"The Shogunate fights with steel. You fight with the souls of the dead."**
 
 The Yomi-gates have torn open. Twisted, bleeding Torii are spreading across the provinces, vomiting hordes of Oni and corrupted Yokai into an alternate, dark-fantasy Edo Japan. The Shogun’s armies are being slaughtered, their silver-mining towns and bamboo groves reduced to cursed ash. 
@@ -10,6 +7,8 @@ You are Morikage, a veteran death-priest of an ancient, forbidden sect of Onmyoj
 You bind them. 
 
 **Yomi no Onmyoji** is a dynamic, AI-driven text RPG where dark fantasy meets Japanese folklore. Step into a gritty, synth-infused interface and command the forces of the underworld to save a realm that fears you.
+
+<img width="1366" height="768" alt="Screenshot 2026-04-15 155843" src="https://github.com/user-attachments/assets/6f9fa49b-d536-496f-bd5e-244682e5cc95" />
 
 ### 💀 CORE FEATURES:
 
