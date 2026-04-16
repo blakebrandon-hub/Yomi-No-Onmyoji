@@ -1271,9 +1271,9 @@ const tts = {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(clean);
         if (this.voice) utter.voice = this.voice;
-        utter.rate  = 0.82;   
+        utter.rate  = 1;   
         utter.pitch = 0.75;   
-        utter.volume = 0.95;
+        utter.volume = 1;
         window.speechSynthesis.speak(utter);
     },
 
@@ -1940,7 +1940,7 @@ What makes Morikage singular: he does not merely fight the Oni. He binds them.
 
 ## VOICE
 Third-person. Dark, precise, atmospheric. No overwrought flourishes.
-75-150 words per response. Let weight exist. Focus on Edo-period aesthetics: blood on tatami mats, smoldering paper talismans (ofuda), rusted katana blades, and the scent of incense and rot.
+~75 words per response. Let weight exist. Focus on Edo-period aesthetics: blood on tatami mats, smoldering paper talismans (ofuda), rusted katana blades, and the scent of incense and rot.
 
 ## ARMY MECHANIC
 When Morikage defeats a human or mundane creature, he may raise it.
@@ -1989,7 +1989,6 @@ Do not invent tags. Use ONLY these exact formats:
 10. [UNIT_HP: Name | +/-N] — Damage or heal a specific raised unit. 
 11. [RAISE: Name | WAS: What they were | MEM: Short memory] — Raising a dead human/creature.
 12. [BIND: DemonName | KIND: Demon type | NATURE: Short demonic character] — Binding a weakened demon.
-13. [SFX: { "synth": "<Type>", "freq": <N>, "detune": <N>, "decay": <N> }] — Spell audio.
 
 ## CRITICAL RULES FOR AI:
 - Read "=== CURRENT STATE ===" carefully. Do not give Morikage items, gold, or units he does not have.
@@ -2079,17 +2078,6 @@ The world responds to the player with the brutal honesty of a sharpened blade. A
 - Soul Essence restores 50 soul
 - Remedy restores 30 HP
 - Sleeping — fully restores health and soul
-
-## SPELL SOUND EFFECTS
-**[SFX]** tags represent witnessed energy.
-- Emit only when event produces distinct audible footprint.
-- Silence is default state.
-- Do not describe sound in prose.
-
-**Synthesis Types:**
-- MetalSynth (800+ Hz, sharp decay): Shrine Chimes — Brittle bone strikes, cracking porcelain gourds, kagura-suzu resonance.
-- MonoSynth (40–100 Hz, high distortion): Yomi Growl — The grinding of stone lanterns, demonic sutras, guttural reanimation.
-- NoiseSynth (White/Pink): The Hollow Breath — Charnel winds rustling bamboo, the hiss of burning paper talismans, Yomi-gate static.
 
 ## STARTING LOCATION
 Hai-dake, Northern Pass. A hellgate smoldering in the ruins of a shukuba (post town).
@@ -2214,7 +2202,7 @@ async function requestVisualize() {
         });
         const paintData = await paintRes.json();
         if (paintData.success) {
-            displayMessage(null, '[Visualize the current scene]', null, paintData.image_base64);
+            displayMessage(null, '', null, paintData.image_base64);
         } else {
             displayMessage(`Visualization failed: ${paintData.error}`, '[Visualize the current scene]', null);
         }
@@ -2428,13 +2416,13 @@ const musicEngine = (() => {
     function playAmbient() {
         ambientAudio.src = AMBIENT_TRACKS[ambientIdx % AMBIENT_TRACKS.length];
         ambientAudio.volume = 0;
-        ambientAudio.play().then(() => fadeTo(ambientAudio, 0.5)).catch(e => console.warn('Ambient play failed:', e));
+        ambientAudio.play().then(() => fadeTo(ambientAudio, 0.3)).catch(e => console.warn('Ambient play failed:', e));
     }
 
     function playBattle() {
         battleAudio.src = BATTLE_TRACKS[battleIdx % BATTLE_TRACKS.length];
         battleAudio.volume = 0;
-        battleAudio.play().then(() => fadeTo(battleAudio, 0.8)).catch(e => console.warn('Battle play failed:', e));
+        battleAudio.play().then(() => fadeTo(battleAudio, 0.5)).catch(e => console.warn('Battle play failed:', e));
     }
 
     function updateBtn() {
