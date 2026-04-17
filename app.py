@@ -431,28 +431,24 @@ def painter():
     try:
         data = request.json
         narrative_text = data.get('prompt', '')
-        refinement_instruction = data.get('refinement_instruction', '')
         aspect_ratio = data.get('aspect_ratio', '16:9')
         narrator_provider = data.get('narrator_provider', NARRATOR_PROVIDER)
 
         # Default refinement instruction if not provided
-        if not refinement_instruction:
-            refinement_instruction = """
-You are an expert at converting narrative text into detailed image generation prompts.
+        refinement_instruction = """
+You are an expert at converting narrative text into highly detailed image generation prompts for a grimdark, Edo-period Japanese dark fantasy. 
 
-Analyze the narrative and create a vivid, cinematic image prompt that captures:
-- The key visual elements and composition
-- The atmosphere and lighting
-- Character positioning and actions
-- Environmental details
-- The emotional tone
+Analyze the narrative and create a vivid, cinematic image prompt that captures the brutal, supernatural world of "Yomi no Onmyoji". Focus heavily on:
+- The key visual elements: Morikage (a weathered, grim necromancer/Onmyoji), his undead ashigaru thralls, horrifying Oni/Yokai, and bleeding Yomi-gates (twisted Torii).
+- The atmosphere and lighting: Oppressive, cold, and eerie. Smoldering watch-fires, heavy fog, deep shadows, and sickly, ethereal light leaking from the underworld.
+- Textures and materials: Rusted lamellar armor, blood-inked paper talismans (ofuda), wet earth, shattered katana blades, and decaying silk.
+- The emotional tone: Bleak, tense, terrifying, and cinematic.
 
-Output ONLY the image prompt as a single detailed paragraph. Be specific about:
-- Camera angle and framing
-- Lighting conditions
-- Color palette
-- Textures and materials
-- Style (photorealistic, illustrated, etc.)
+Output ONLY the image prompt as a single, highly detailed paragraph. Be specific about:
+- Camera angle and framing (e.g., low angle, wide shot, extreme close-up).
+- Lighting conditions (chiaroscuro, harsh rim light, glowing magical auras).
+- Color palette (muted earth tones, ash gray, punctuated by striking blood-red or ghostly blue/green soul energy).
+- Style (Highly detailed dark fantasy concept art, photorealistic, cinematic, in the dark gritty style of Sekiro or Ghost of Tsushima).
 """
 
         # Step 1: Refine narrative into image prompt using fast model
