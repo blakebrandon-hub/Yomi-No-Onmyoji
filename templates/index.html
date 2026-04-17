@@ -1471,28 +1471,28 @@ const gameState = {
 
 const spells = {
     summoning: [
-        { name: 'Yomi Call', school: 'Summoning', cost: '15 Soul', unlocked: true, unlockCost: 1 },
-        { name: 'Call Shikigami', school: 'Summoning', cost: '20 Soul', unlocked: false, unlockCost: 2 },
-        { name: 'Bind Yurei', school: 'Summoning', cost: '25 Soul', unlocked: false, unlockCost: 3 },
-        { name: 'Mass Rising', school: 'Summoning', cost: '40 Soul', unlocked: false, unlockCost: 4 },
+        { name: 'Yomi Call', school: 'Summoning', cost: '15 Soul', unlocked: true, unlockCost: 0 },
+        { name: 'Call Shikigami', school: 'Summoning', cost: '20 Soul', unlocked: false, unlockCost: 1 },
+        { name: 'Bind Yurei', school: 'Summoning', cost: '25 Soul', unlocked: false, unlockCost: 2 },
+        { name: 'Mass Rising', school: 'Summoning', cost: '40 Soul', unlocked: false, unlockCost: 3 },
     ],
     corruption: [
-        { name: 'Soul Drain', school: 'Corruption', cost: '12 Soul', unlocked: true, unlockCost: 1 },
-        { name: 'Wither', school: 'Corruption', cost: '18 Soul', unlocked: false, unlockCost: 2 },
-        { name: 'Kegare Siphon', school: 'Corruption', cost: '22 Soul', unlocked: false, unlockCost: 3 },
-        { name: 'Necrotic Burst', school: 'Corruption', cost: '30 Soul', unlocked: false, unlockCost: 4 },
+        { name: 'Soul Drain', school: 'Corruption', cost: '12 Soul', unlocked: true, unlockCost: 0 },
+        { name: 'Wither', school: 'Corruption', cost: '18 Soul', unlocked: false, unlockCost: 1 },
+        { name: 'Kegare Siphon', school: 'Corruption', cost: '22 Soul', unlocked: false, unlockCost: 2 },
+        { name: 'Necrotic Burst', school: 'Corruption', cost: '30 Soul', unlocked: false, unlockCost: 3 },
     ],
     warding: [
-        { name: 'Seal Torii', school: 'Warding', cost: '25 Soul', unlocked: true, unlockCost: 1 },
-        { name: 'Death Ward', school: 'Warding', cost: '10 Soul', unlocked: false, unlockCost: 2 },
-        { name: 'Corpse Armor', school: 'Warding', cost: '15 Soul', unlocked: false, unlockCost: 3 },
-        { name: 'Yokai Ward', school: 'Warding', cost: '35 Soul', unlocked: false, unlockCost: 4 },
+        { name: 'Seal Torii', school: 'Warding', cost: '25 Soul', unlocked: true, unlockCost: 0 },
+        { name: 'Death Ward', school: 'Warding', cost: '10 Soul', unlocked: false, unlockCost: 1 },
+        { name: 'Corpse Armor', school: 'Warding', cost: '15 Soul', unlocked: false, unlockCost: 2 },
+        { name: 'Yokai Ward', school: 'Warding', cost: '35 Soul', unlocked: false, unlockCost: 3 },
     ],
     mastery: [
-        { name: 'Soul Echo', school: 'Mastery', cost: '8 Soul', unlocked: true, unlockCost: 1 },
-        { name: 'Spirit Harvest', school: 'Mastery', cost: '20 Soul', unlocked: false, unlockCost: 2 },
-        { name: 'Bind Oni', school: 'Mastery', cost: '30 Soul', unlocked: false, unlockCost: 3 },
-        { name: 'Zan-Kuroda\'s Bane', school: 'Mastery', cost: '60 Soul', unlocked: false, unlockCost: 4 },
+        { name: 'Soul Echo', school: 'Mastery', cost: '8 Soul', unlocked: true, unlockCost: 0 },
+        { name: 'Spirit Harvest', school: 'Mastery', cost: '20 Soul', unlocked: false, unlockCost: 1 },
+        { name: 'Bind Oni', school: 'Mastery', cost: '30 Soul', unlocked: false, unlockCost: 2 },
+        { name: 'Zan-Kuroda\'s Bane', school: 'Mastery', cost: '60 Soul', unlocked: false, unlockCost: 3 },
     ]
 };
 
@@ -2099,27 +2099,27 @@ Morikage draws on Soul energy to cast through blood-inked ofuda. Spells have con
 
 **Summoning**
 - Yomi Call — 15 Soul. Animates a recently slain human or mundane corpse. Requires a body. (UNLOCKED)
-- Call Shikigami — 20 Soul. Summons a bound paper-spirit for scouting or communion. Cannot fight. (LOCKED - Requires 2 SP)
-- Bind Yurei — 25 Soul. Enslaves a free-roaming ghost to Morikage's will. (LOCKED - Requires 3 SP)
-- Mass Rising — 40 Soul. Raises multiple corpses at once. Catastrophic if rushed. (LOCKED - Requires 4 SP)
+- Call Shikigami — 20 Soul. Summons a bound paper-spirit for scouting or communion. Cannot fight. (LOCKED - Requires 1 SP)
+- Bind Yurei — 25 Soul. Enslaves a free-roaming ghost to Morikage's will. (LOCKED - Requires 2 SP)
+- Mass Rising — 40 Soul. Raises multiple corpses at once. Catastrophic if rushed. (LOCKED - Requires 3 SP)
 
 **Corruption**
 - Soul Drain — 12 Soul. Leaches life-force from a target, restoring Morikage's HP slightly. (UNLOCKED)
-- Wither — 18 Soul. Decays flesh and rusts armor, weakening a living enemy over time. (LOCKED - Requires 2 SP)
-- Kegare Siphon — 22 Soul. Turns an oni's own hellfire against it. Only works on flame-type demons. (LOCKED - Requires 3 SP)
-- Necrotic Burst — 30 Soul. Explosive release of death-energy and cursed ash. Damages all nearby. (LOCKED - Requires 4 SP)
+- Wither — 18 Soul. Decays flesh and rusts armor, weakening a living enemy over time. (LOCKED - Requires 1 SP)
+- Kegare Siphon — 22 Soul. Turns an oni's own hellfire against it. Only works on flame-type demons. (LOCKED - Requires 2 SP)
+- Necrotic Burst — 30 Soul. Explosive release of death-energy and cursed ash. Damages all nearby. (LOCKED - Requires 3 SP)
 
 **Warding**
 - Seal Torii — 25 Soul. Partially closes or destabilizes a Yomi-gate. Temporary without a Shinto ritual. (UNLOCKED)
-- Death Ward — 10 Soul. Marks Morikage against one incoming killing blow. (LOCKED - Requires 2 SP)
-- Corpse Armor — 15 Soul. Wraps Morikage in animated, shattered lamellar and bone. Reduces HP loss. (LOCKED - Requires 3 SP)
-- Yokai Ward — 35 Soul. Creates a salt-and-blood barrier demons cannot willingly cross. Exhausting to maintain. (LOCKED - Requires 4 SP)
+- Death Ward — 10 Soul. Marks Morikage against one incoming killing blow. (LOCKED - Requires 1 SP)
+- Corpse Armor — 15 Soul. Wraps Morikage in animated, shattered lamellar and bone. Reduces HP loss. (LOCKED - Requires 2 SP)
+- Yokai Ward — 35 Soul. Creates a salt-and-blood barrier demons cannot willingly cross. Exhausting to maintain. (LOCKED - Requires 3 SP)
 
 **Mastery**
 - Soul Echo — 8 Soul. Reads the last memory of a corpse. Useful for intelligence. (UNLOCKED)
-- Spirit Harvest — 20 Soul. Extracts and stores soul energy from dying creatures using a gourd. (LOCKED - Requires 2 SP)
-- Bind Oni — 30 Soul. The forbidden binding rite. Strips one weakened demon's will via a nailed talisman. Requires the demon be below ~30 HP. (LOCKED - Requires 3 SP)
-- Zan-Kuroda's Bane — 60 Soul. A weapon of last resort, forged in the shadow-order's final days. Morikage cannot cast this lightly. (LOCKED - Requires 4 SP)
+- Spirit Harvest — 20 Soul. Extracts and stores soul energy from dying creatures using a gourd. (LOCKED - Requires 1 SP)
+- Bind Oni — 30 Soul. The forbidden binding rite. Strips one weakened demon's will via a nailed talisman. Requires the demon be below ~30 HP. (LOCKED - Requires 2 SP)
+- Zan-Kuroda's Bane — 60 Soul. A weapon of last resort, forged in the shadow-order's final days. Morikage cannot cast this lightly. (LOCKED - Requires 3 SP)
 
 ## OATHS
 - Most oaths should be finished in 3-5 turns.
