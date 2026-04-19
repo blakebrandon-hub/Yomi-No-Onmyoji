@@ -1232,13 +1232,7 @@ header {
             <!-- Messages appear here -->
         </div>
 
-        <!-- QUICK ACTIONS -->
-        <div class="quick-actions">
-            <button class="btn-quick" onclick="quickAction('weapon')">⚔️ USE WEAPON</button>
-            <button class="btn-quick" onclick="quickAction('risen')">💀 SEND RISEN</button>
-        </div>
-
-        <div class="chronicle-input" style="border-top:none;">
+        <div class="chronicle-input">
             <input type="text" class="input-field" id="action-input" placeholder="What do you do?" onkeydown="handleKey(event)">
             <button class="btn-submit" onclick="sendAction()">TRANSMIT</button>
         </div>
@@ -1252,14 +1246,6 @@ header {
             <div class="status-section">
                 <div class="section-label">Status</div>
                 
-                <div class="status-row" style="margin-bottom:8px;">
-                    <span class="status-row-label">Level <span id="level-val" style="color:var(--accent-gold); font-size:0.8rem;">1</span></span>
-                    <span class="status-row-value" style="color:var(--accent-gold); font-size:0.6rem; letter-spacing:1px;">SP: <span id="sp-val" style="font-size:0.8rem;">0</span></span>
-                </div>
-                <div class="stat-bar" style="margin-bottom:12px; height:2px;">
-                    <div class="stat-bar-fill gold" id="exp-bar" style="width:0%;"></div>
-                </div>
-
                 <div class="status-row">
                     <span class="status-row-label">Location</span>
                     <span class="status-row-value" id="current-location">Northern Pass</span>
@@ -1575,27 +1561,27 @@ const gameState = {
 const spells = {
     summoning: [
         { name: 'Yomi Call', school: 'Summoning', cost: '15 Soul', unlocked: true, unlockCost: 0 },
-        { name: 'Call Shikigami', school: 'Summoning', cost: '20 Soul', unlocked: false, unlockCost: 1 },
-        { name: 'Bind Yurei', school: 'Summoning', cost: '25 Soul', unlocked: false, unlockCost: 2 },
-        { name: 'Mass Rising', school: 'Summoning', cost: '40 Soul', unlocked: false, unlockCost: 3 },
+        { name: 'Call Shikigami', school: 'Summoning', cost: '20 Soul', unlocked: true, unlockCost: 1 },
+        { name: 'Bind Yurei', school: 'Summoning', cost: '25 Soul', unlocked: true, unlockCost: 2 },
+        { name: 'Mass Rising', school: 'Summoning', cost: '40 Soul', unlocked: true, unlockCost: 3 },
     ],
     corruption: [
         { name: 'Soul Drain', school: 'Corruption', cost: '12 Soul', unlocked: true, unlockCost: 0 },
-        { name: 'Wither', school: 'Corruption', cost: '18 Soul', unlocked: false, unlockCost: 1 },
-        { name: 'Kegare Siphon', school: 'Corruption', cost: '22 Soul', unlocked: false, unlockCost: 2 },
-        { name: 'Necrotic Burst', school: 'Corruption', cost: '30 Soul', unlocked: false, unlockCost: 3 },
+        { name: 'Wither', school: 'Corruption', cost: '18 Soul', unlocked: true, unlockCost: 1 },
+        { name: 'Kegare Siphon', school: 'Corruption', cost: '22 Soul', unlocked: true, unlockCost: 2 },
+        { name: 'Necrotic Burst', school: 'Corruption', cost: '30 Soul', unlocked: true, unlockCost: 3 },
     ],
     warding: [
         { name: 'Seal Torii', school: 'Warding', cost: '25 Soul', unlocked: true, unlockCost: 0 },
-        { name: 'Death Ward', school: 'Warding', cost: '10 Soul', unlocked: false, unlockCost: 1 },
-        { name: 'Corpse Armor', school: 'Warding', cost: '15 Soul', unlocked: false, unlockCost: 2 },
-        { name: 'Yokai Ward', school: 'Warding', cost: '35 Soul', unlocked: false, unlockCost: 3 },
+        { name: 'Death Ward', school: 'Warding', cost: '10 Soul', unlocked: true, unlockCost: 1 },
+        { name: 'Corpse Armor', school: 'Warding', cost: '15 Soul', unlocked: true, unlockCost: 2 },
+        { name: 'Yokai Ward', school: 'Warding', cost: '35 Soul', unlocked: true, unlockCost: 3 },
     ],
     mastery: [
         { name: 'Soul Echo', school: 'Mastery', cost: '8 Soul', unlocked: true, unlockCost: 0 },
-        { name: 'Spirit Harvest', school: 'Mastery', cost: '20 Soul', unlocked: false, unlockCost: 1 },
-        { name: 'Bind Oni', school: 'Mastery', cost: '30 Soul', unlocked: false, unlockCost: 2 },
-        { name: 'Zan-Kuroda\'s Bane', school: 'Mastery', cost: '60 Soul', unlocked: false, unlockCost: 3 },
+        { name: 'Spirit Harvest', school: 'Mastery', cost: '20 Soul', unlocked: true, unlockCost: 1 },
+        { name: 'Bind Oni', school: 'Mastery', cost: '30 Soul', unlocked: true, unlockCost: 2 },
+        { name: 'Zan-Kuroda\'s Bane', school: 'Mastery', cost: '60 Soul', unlocked: true, unlockCost: 3 },
     ]
 };
 
@@ -1660,40 +1646,15 @@ function renderSpells(school) {
     list.innerHTML = '';
     spells[school].forEach((spell, idx) => {
         const el = document.createElement('div');
-        
-        if (spell.unlocked) {
-            el.className = 'spell-item';
-            el.innerHTML = `
-                <div class="spell-info">
-                    <div class="spell-school">${spell.school}</div>
-                    <div class="spell-name">${spell.name}</div>
-                </div>
-                <div class="spell-cost">${spell.cost}</div>
-            `;
-            el.onclick = () => castSpell(spell.name);
-        } else {
-            const canAfford = gameState.skillPoints >= spell.unlockCost;
-            el.className = 'spell-item locked';
-            el.innerHTML = `
-                <div class="spell-info">
-                    <div class="spell-school">${spell.school}</div>
-                    <div class="spell-name">${spell.name}</div>
-                </div>
-                <div class="spell-cost" style="color:var(--text-dim);">
-                    Locked
-                    <div class="spell-action-text" style="color: ${canAfford ? 'var(--accent-gold)' : 'var(--text-dim)'};">
-                        ${canAfford ? `Click to Unlock (${spell.unlockCost} SP)` : `Requires ${spell.unlockCost} SP`}
-                    </div>
-                </div>
-            `;
-            if (canAfford) {
-                el.onclick = () => unlockSpell(school, idx);
-                el.style.cursor = 'pointer';
-            } else {
-                el.style.cursor = 'not-allowed';
-            }
-        }
-        
+        el.className = 'spell-item';
+        el.innerHTML = `
+            <div class="spell-info">
+                <div class="spell-school">${spell.school}</div>
+                <div class="spell-name">${spell.name}</div>
+            </div>
+            <div class="spell-cost">${spell.cost}</div>
+        `;
+        el.onclick = () => castSpell(spell.name);
         list.appendChild(el);
     });
 }
@@ -1702,17 +1663,6 @@ function castSpell(name) {
     const input = document.getElementById('action-input');
     input.value = `Cast ${name}`;
     input.focus();
-}
-
-function unlockSpell(school, idx) {
-    const spell = spells[school][idx];
-    if (gameState.skillPoints >= spell.unlockCost && !spell.unlocked) {
-        gameState.skillPoints -= spell.unlockCost;
-        spell.unlocked = true;
-        renderSpells(school);
-        updateUI();
-        displayMessage(`<em>Through grim meditation, Morikage unlocks the secrets of ${spell.name}.</em>`, null, null);
-    }
 }
 
 function selectCraftSlot(slotId, itemName) {
@@ -1796,12 +1746,6 @@ function updateUI() {
     document.getElementById('soul-val').textContent = gameState.soul;
     document.getElementById('gold-val').textContent = gameState.gold;
     
-    // Level & EXP
-    document.getElementById('level-val').textContent = gameState.level;
-    document.getElementById('sp-val').textContent = gameState.skillPoints;
-    const expPercent = Math.min(100, Math.floor((gameState.exp / gameState.expNext) * 100));
-    document.getElementById('exp-bar').style.width = `${expPercent}%`;
-
     // Army
     document.getElementById('army-size').textContent = gameState.armySize;
     document.getElementById('army-count-label').textContent = gameState.armySize;
@@ -1944,29 +1888,6 @@ function parseTags(text) {
     const soulMatch = text.match(/\[SOUL:\s*([+-]?\d+)\]/i);
     if (soulMatch) gameState.soul = Math.max(0, Math.min(100, gameState.soul + parseInt(soulMatch[1])));
     
-    const expMatches = [...text.matchAll(/\[EXP:\s*([+-]?\d+)\]/gi)];
-    let leveledUp = false;
-    expMatches.forEach(m => {
-        const gained = parseInt(m[1]);
-        if (gained > 0) { // Ignore negative EXP tags entirely
-            gameState.exp += gained;
-            while (gameState.exp >= gameState.expNext) {
-                gameState.exp -= gameState.expNext;
-                gameState.level++;
-                gameState.skillPoints++;
-                gameState.expNext = Math.floor(gameState.expNext * 1.5);
-                leveledUp = true;
-            }
-        }
-    });
-
-    if (leveledUp) {
-        setTimeout(() => {
-            displayMessage(`<em style="color:var(--accent-gold);">Morikage's mastery over death deepens. He has reached Level ${gameState.level}. (+1 SP)</em>`, null, null);
-            updateUI();
-        }, 100);
-    }
-
     // 2. Map & Standing
     const locMatch = text.match(/\[LOC:\s*([^|\]]+)(?:\s*\|\s*([^\]]+))?\]/i);
     if (locMatch) {
@@ -2138,7 +2059,6 @@ function stripTags(text) {
     return text
         .replace(/\[HP:\s*[+-]?\d+\]/gi, '')
         .replace(/\[SOUL:\s*[+-]?\d+\]/gi, '')
-        .replace(/\[EXP:\s*[+-]?\d+\]/gi, '')
         .replace(/\[LOC:\s*[^\]]+\]/gi, '')
         .replace(/\[STAND:\s*[^\]]+\]/gi, '')
         .replace(/\[Vow_Start:\s*[^\]]+\]/gi, '')
@@ -2600,7 +2520,7 @@ function triggerDeathScreen() {
     const epitaph = DEATH_EPITAPHS[Math.floor(Math.random() * DEATH_EPITAPHS.length)];
     document.getElementById('death-epitaph').innerHTML = epitaph;
     document.getElementById('death-turn-info').textContent =
-        `Fell on turn ${gameState.turn} · ${gameState.location}, ${gameState.region} · Level ${gameState.level}`;
+        `Fell on turn ${gameState.turn} · ${gameState.location}, ${gameState.region}`;
 
     // Spawn particles
     const container = document.getElementById('death-particles');
@@ -2627,10 +2547,6 @@ function restartGame() {
     // Reset state to defaults
     gameState.hp = 100;
     gameState.soul = 80;
-    gameState.level = 1;
-    gameState.exp = 0;
-    gameState.expNext = 100;
-    gameState.skillPoints = 0;
     gameState.gold = 100;
     gameState.turn = 0;
     gameState.location = 'Northern Pass';
@@ -2655,9 +2571,9 @@ function restartGame() {
     gameState.enemies = [];
     gameState.ritualStatus = 0;
 
-    // Reset Spells
+    // Reset Spells — all remain unlocked
     Object.keys(spells).forEach(school => {
-        spells[school].forEach((spell, idx) => spell.unlocked = (idx === 0));
+        spells[school].forEach(spell => spell.unlocked = true);
     });
 
     conversationLog = [];
