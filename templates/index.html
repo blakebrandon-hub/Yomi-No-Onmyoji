@@ -1659,7 +1659,47 @@ function renderSpells(school) {
     });
 }
 
+// ── SPELL AUDIO ──
+const spellAudioMap = {
+    // Summoning
+    'Yomi Call':      'yomi_call.mp3',
+    'Call Shikigami': 'call_shikigami.mp3',
+    'Bind Yurei':     'bind_yurei.mp3',
+    'Mass Rising':    'mass_rising.mp3',
+    // Corruption
+    'Soul Drain':     'soul_drain.mp3',
+    'Wither':         'wither.mp3',
+    'Kegare Siphon':  'kegare_siphon.mp3',
+    'Necrotic Burst': 'necrotic_burst.mp3',
+    // Warding
+    'Seal Torii':     'seal_torii.mp3',
+    'Death Ward':     'death_ward.mp3',
+    'Corpse Armor':   'corpse_armor.mp3',
+    'Yokai Ward':     'yokai_ward.mp3',
+    // Mastery
+    'Soul Echo':          'soul_echo.mp3',
+    'Spirit Harvest':     'spirit_harvest.mp3',
+    'Bind Oni':           'bind_oni.mp3',
+    "Zan-Kuroda's Bane":  'zan-kurodas_bane.mp3',
+};
+
+let _spellAudioNode = null;
+let _pendingSpellSFX = null; // set on click, fired when AI confirms with [SOUL: -N]
+
+function playSpellSFX(spellName) {
+    const file = spellAudioMap[spellName];
+    if (!file) return;
+    if (_spellAudioNode) {
+        _spellAudioNode.pause();
+        _spellAudioNode.currentTime = 0;
+    }
+    _spellAudioNode = new Audio(file);
+    _spellAudioNode.volume = 0.8;
+    _spellAudioNode.play().catch(e => console.warn('Spell SFX failed:', e));
+}
+
 function castSpell(name) {
+    _pendingSpellSFX = name; // arm — fires when AI confirms soul was spent
     const input = document.getElementById('action-input');
     input.value = `Cast ${name}`;
     input.focus();
@@ -2096,11 +2136,6 @@ What makes Morikage singular: he does not merely fight the Oni. He binds them.
 Third-person. Dark, precise, atmospheric. No overwrought flourishes.
 ~75 words per response. Let weight exist. Focus on Edo-period aesthetics: blood on tatami mats, smoldering paper talismans (ofuda), rusted katana blades, and the scent of incense and rot.
 
-## EXPERIENCE & PROGRESSION
-When Morikage defeats enemies, completes vows, or survives horrors, he gains Experience (EXP).
-Emit: [EXP: +N] (e.g., +20 for a lesser demon, +50 for a boss, +10 for a mundane foe).
-*CRITICAL: NEVER subtract EXP. NEVER manage level ups. The system handles level thresholds automatically. ONLY award positive EXP.*
-
 ## COMBAT & ENEMIES
 During combat, track the enemy's health by emitting the ENEMY tag. 
 Example: [ENEMY: Guren | HP: 45/100]
@@ -2180,7 +2215,7 @@ Morikage draws on Soul energy to cast through blood-inked ofuda. Spells have con
 
 **Warding**
 - Seal Torii — 25 Soul. Partially closes or destabilizes a Yomi-gate. Temporary without a Shinto ritual.
-- Death Ward — 10 Soul. Marks Morikage against one incoming killing blow.
+- Death Ward — 10 Soul. Marks Morikage against one incoming killing blow. 
 - Corpse Armor — 15 Soul. Wraps Morikage in animated, shattered lamellar and bone. Reduces HP loss. 
 - Yokai Ward — 35 Soul. Creates a salt-and-blood barrier demons cannot willingly cross. Exhausting to maintain.
 
@@ -2294,7 +2329,6 @@ Only emit tags that changed. All numbers whole integers.`;
 // ── CONTEXT BUILDER ──
 function buildContext() {
     let ctx = `=== CURRENT STATE ===\n`;
-    ctx += `Level: ${gameState.level} | EXP: ${gameState.exp}/${gameState.expNext} | Skill Points: ${gameState.skillPoints}\n`;
     ctx += `HP: ${gameState.hp}/100 | Soul: ${gameState.soul} | Gold (Ryo): ${gameState.gold}\n`;
     ctx += `Location: ${gameState.location} (${gameState.region})\n`;
     ctx += `Ritual Status: ${gameState.ritualStatus === 1 ? 'Prepared (Ready to perform binding)' : 'Not Prepared'}\n`;
@@ -2384,6 +2418,12 @@ async function sendAction() {
 
         const signal = parseTags(responseText);
         const clean = stripTags(responseText);
+
+        // Fire spell SFX only when AI confirms soul was spent (spell actually happened)
+        if (_pendingSpellSFX && /\[SOUL:\s*-\d+\]/i.test(responseText)) {
+            playSpellSFX(_pendingSpellSFX);
+        }
+        _pendingSpellSFX = null;
 
         const imgMatch = responseText.match(/\[GENERATE_IMAGE:\s*([^\]]+)\]/i);
         let imageB64 = null;
